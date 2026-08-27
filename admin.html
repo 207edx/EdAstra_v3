@@ -1,0 +1,1555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AstroCore Admin</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg-a:#fce4d6;--bg-b:#e8d5f5;--bg-c:#d5e8f5;--bg-d:#d5f5e8;
+  --surface:rgba(255,255,255,0.55);--surface2:rgba(255,255,255,0.75);
+  --text:#1a1035;--dim:#7a6e8a;--dim2:#4b5563;
+  --border:rgba(255,255,255,0.7);--border2:rgba(0,0,0,0.07);
+  --orange:#f97316;--purple:#9333ea;--blue:#3b82f6;--green:#10b981;
+  --red:#ef4444;--amber:#f59e0b;
+  --ff-display:'DM Serif Display',serif;
+  --ff-body:'Plus Jakarta Sans',sans-serif;
+  --ff-ui:'Syne',sans-serif;
+  --dock-h:74px;
+}
+html,body{height:100%;overflow:hidden;font-family:var(--ff-body);color:var(--text);}
+body{background:linear-gradient(135deg,var(--bg-a) 0%,var(--bg-b) 40%,var(--bg-c) 70%,var(--bg-d) 100%);display:flex;flex-direction:column;}
+.hidden{display:none!important;}
+.blob{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0;}
+.blob-1{width:500px;height:500px;background:rgba(249,115,22,0.2);top:-120px;left:-100px;}
+.blob-2{width:400px;height:400px;background:rgba(147,51,234,0.16);bottom:-80px;right:20%;animation:drift 8s ease-in-out infinite;}
+.blob-3{width:300px;height:300px;background:rgba(59,130,246,0.16);top:30%;right:-80px;animation:drift 6s ease-in-out infinite reverse;}
+@keyframes drift{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
+::-webkit-scrollbar{width:4px;height:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:rgba(147,51,234,0.2);border-radius:10px;}
+.glass{background:var(--surface);border:1px solid var(--border);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);box-shadow:0 8px 32px rgba(0,0,0,0.05),inset 0 1px 0 rgba(255,255,255,0.9);}
+.glass2{background:rgba(255,255,255,0.35);border:1px solid var(--border);}
+input,textarea,select{font-family:var(--ff-body);background:rgba(255,255,255,0.8);border:1px solid rgba(147,51,234,0.15);color:var(--text);border-radius:12px;padding:9px 13px;font-size:13px;outline:none;width:100%;transition:all .2s;}
+input:focus,textarea:focus,select:focus{border-color:var(--purple);background:#fff;box-shadow:0 0 0 3px rgba(147,51,234,0.1);}
+input::placeholder,textarea::placeholder{color:rgba(0,0,0,0.25);}
+select option{background:#fff;color:var(--text);}
+button{font-family:var(--ff-body);cursor:pointer;border:none;transition:all .2s;outline:none;}
+button:disabled{opacity:.5;cursor:not-allowed;}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:12px;font-size:12.5px;font-weight:700;}
+.btn-r{background:linear-gradient(135deg,var(--red),#dc2626);color:#fff;box-shadow:0 4px 14px rgba(239,68,68,0.2);}
+.btn-r:hover{box-shadow:0 6px 20px rgba(239,68,68,0.3);transform:translateY(-1px);}
+.btn-p{background:linear-gradient(135deg,var(--purple),#7c3aed);color:#fff;box-shadow:0 4px 14px rgba(147,51,234,0.2);}
+.btn-p:hover{box-shadow:0 6px 20px rgba(147,51,234,0.3);transform:translateY(-1px);}
+.btn-g{background:linear-gradient(135deg,var(--green),#059669);color:#fff;box-shadow:0 4px 14px rgba(16,185,129,0.2);}
+.btn-g:hover{box-shadow:0 6px 20px rgba(16,185,129,0.3);transform:translateY(-1px);}
+.btn-gh{background:rgba(255,255,255,0.6);color:var(--text);border:1px solid var(--border2);}
+.btn-gh:hover{background:rgba(255,255,255,0.9);}
+.btn-sm{padding:6px 14px;font-size:11.5px;border-radius:9px;}
+.btn-xs{padding:4px 10px;font-size:10.5px;border-radius:7px;}
+.bx{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:999px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;}
+.bx-r{background:rgba(239,68,68,0.1);color:var(--red);border:1px solid rgba(239,68,68,0.2);}
+.bx-p{background:rgba(147,51,234,0.1);color:var(--purple);border:1px solid rgba(147,51,234,0.2);}
+.bx-g{background:rgba(16,185,129,0.1);color:var(--green);border:1px solid rgba(16,185,129,0.2);}
+.bx-b{background:rgba(59,130,246,0.1);color:var(--blue);border:1px solid rgba(59,130,246,0.2);}
+.bx-y{background:rgba(245,158,11,0.1);color:var(--amber);border:1px solid rgba(245,158,11,0.2);}
+@keyframes lp{0%,100%{opacity:1}50%{opacity:0.35}}
+.lpulse{animation:lp 1.2s ease infinite;}
+@keyframes fu{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fu .22s ease forwards;}
+#topbar{height:52px;flex-shrink:0;display:flex;align-items:center;padding:0 18px;gap:12px;background:rgba(255,255,255,0.5);border-bottom:1px solid var(--border);backdrop-filter:blur(28px);z-index:50;position:relative;}
+.brand{font-family:var(--ff-ui);font-size:1.05rem;font-weight:800;color:var(--text);}
+.brand span{color:var(--purple);}
+#sync{display:flex;align-items:center;gap:6px;margin-left:auto;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;color:var(--green);background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.15);}
+#sync.busy{color:var(--amber);background:rgba(245,158,11,0.08);border-color:rgba(245,158,11,0.2);}
+#sync.err{color:var(--red);background:rgba(239,68,68,0.08);border-color:rgba(239,68,68,0.2);}
+#sync-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);}
+#sync.busy #sync-dot{background:var(--amber);box-shadow:0 0 6px var(--amber);}
+#sync.err #sync-dot{background:var(--red);box-shadow:0 0 6px var(--red);}
+#admin-av{width:28px;height:28px;border-radius:50%;object-fit:cover;border:1.5px solid var(--border);margin-left:6px;}
+#content-row{flex:1;display:flex;overflow:hidden;position:relative;z-index:1;}
+#main{flex:1;overflow:hidden;display:flex;flex-direction:column;}
+.page{display:none;flex:1;overflow:hidden;}
+.page.on{display:flex;flex-direction:column;}
+.pscroll{flex:1;overflow-y:auto;padding:20px;padding-bottom:50px;}
+#dock-wrap{flex-shrink:0;height:var(--dock-h);display:flex;align-items:center;justify-content:center;border-top:1px solid var(--border);background:rgba(255,255,255,0.4);backdrop-filter:blur(28px);position:relative;z-index:5;}
+.dock{display:flex;align-items:flex-end;gap:8px;padding:10px 20px;background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.8);border-radius:28px;backdrop-filter:blur(30px);box-shadow:0 12px 40px rgba(0,0,0,0.06),inset 0 1px 0 rgba(255,255,255,0.9);}
+.dock-btn{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1);position:relative;}
+.dock-btn:hover{transform:translateY(-10px) scale(1.12);}
+.dock-btn .icon{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:17px;transition:all .25s;color:var(--dim);background:rgba(255,255,255,0.4);}
+.dock-btn .label{font-family:var(--ff-ui);font-size:7.5px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.06em;transition:color .2s;}
+.dock-btn:hover .label{color:var(--text);}
+.dock-btn.on .icon{background:white;color:var(--purple);box-shadow:0 4px 16px rgba(147,51,234,0.2);}
+.dock-btn.on .label{color:var(--purple);}
+.dock-btn::after{content:'';position:absolute;bottom:-6px;width:4px;height:4px;border-radius:50%;background:var(--purple);opacity:0;transition:opacity .2s;}
+.dock-btn.on::after{opacity:1;}
+#live-split{flex:1;display:flex;overflow:hidden;}
+#live-left{width:340px;flex-shrink:0;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;background:rgba(255,255,255,0.2);}
+#live-sessions-scroll{flex:1;overflow-y:auto;padding:12px;}
+#live-right{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.sess-card{border-radius:14px;overflow:hidden;cursor:pointer;transition:all .22s;border:1px solid var(--border);margin-bottom:10px;background:rgba(255,255,255,0.6);backdrop-filter:blur(20px);}
+.sess-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(147,51,234,0.1);}
+.sess-card.sel{border-color:var(--purple);box-shadow:0 0 0 2px rgba(147,51,234,0.2);}
+.vthumb{position:relative;padding-bottom:52%;background:linear-gradient(135deg,rgba(249,115,22,0.1),rgba(147,51,234,0.1));overflow:hidden;}
+.vthumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.vthumb .vover{position:absolute;inset:0;background:linear-gradient(to top,rgba(26,16,53,0.75) 0%,transparent 60%);}
+.vthumb .vtl{position:absolute;top:8px;left:8px;}
+.vthumb .vbl{position:absolute;bottom:8px;left:10px;right:10px;}
+.ctab-row{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;padding:0 4px;background:rgba(255,255,255,0.3);}
+.ctab{padding:11px 16px;font-size:11px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.05em;background:transparent;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .2s;font-family:var(--ff-ui);}
+.ctab:hover{color:var(--text);}
+.ctab.on{color:var(--purple);border-bottom-color:var(--purple);}
+.cview{display:none;flex:1;flex-direction:column;overflow:hidden;}
+.cview.on{display:flex;}
+.cscroll{flex:1;overflow-y:auto;padding:12px;}
+.cmsg{background:rgba(255,255,255,0.6);border:1px solid var(--border);border-radius:12px;padding:8px 12px;font-size:12.5px;margin-bottom:7px;color:var(--text);backdrop-filter:blur(10px);}
+.cmsg .csender{font-weight:800;color:var(--purple);font-size:10px;margin-bottom:3px;}
+.dc{border-radius:14px;padding:14px;border:1px solid var(--border);background:rgba(255,255,255,0.55);border-left:4px solid #c4b5fd;margin-bottom:10px;backdrop-filter:blur(16px);}
+.dc.ans{border-left-color:var(--green);}
+.dc .dn{font-size:10.5px;font-weight:800;color:var(--purple);margin-bottom:5px;}
+.dc .dt{font-size:12.5px;color:var(--text);line-height:1.55;}
+.dc .da{margin-top:9px;padding:9px 11px;border-radius:9px;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.15);}
+.dc .da-l{font-size:9px;font-weight:800;color:var(--green);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;}
+.dc .da-t{font-size:12.5px;color:var(--dim2);}
+.dc-actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+.pc{border-radius:14px;overflow:hidden;border:1px solid var(--border);background:rgba(255,255,255,0.6);margin-bottom:10px;backdrop-filter:blur(16px);}
+.pc-head{padding:12px 14px;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.4);}
+.pc-q{font-size:13px;font-weight:700;color:var(--text);line-height:1.4;margin-bottom:5px;}
+.pc-body{padding:10px 14px;}
+.pc-opt-wrapper{position:relative;border-radius:9px;overflow:hidden;border:1px solid var(--border2);background:rgba(255,255,255,0.5);margin-bottom:6px;}
+.pc-opt-fill{position:absolute;top:0;left:0;bottom:0;background:rgba(147,51,234,0.1);transition:width 0.4s ease;z-index:0;}
+.pc-opt-fill.correct-fill{background:rgba(16,185,129,0.12);}
+.pc-opt-content{position:relative;z-index:1;padding:9px 13px;display:flex;align-items:center;justify-content:space-between;font-size:12.5px;font-weight:700;}
+.pc-lb{padding:0 14px 10px;}
+.pc-lb-row{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;background:rgba(255,255,255,0.5);border:1px solid var(--border);margin-bottom:5px;font-size:11.5px;}
+.ftree{display:flex;flex-direction:column;gap:3px;}
+.fnode{border-radius:10px;overflow:hidden;border:1px solid var(--border);margin-bottom:2px;}
+.fnode-head{display:flex;align-items:center;gap:8px;padding:9px 12px;cursor:pointer;background:rgba(255,255,255,0.6);font-size:12.5px;font-weight:600;color:var(--dim2);transition:all .2s;user-select:none;}
+.fnode-head:hover{background:rgba(255,255,255,0.9);color:var(--text);}
+.fnode-head i.arrow{font-size:9px;margin-left:auto;transition:transform .2s;}
+.fnode.open > .fnode-head i.arrow{transform:rotate(90deg);}
+.fnode-children{display:none;padding:4px 0 4px 14px;border-top:1px solid var(--border);background:rgba(255,255,255,0.3);}
+.fnode.open > .fnode-children{display:block;}
+.fnode-head.sel{background:rgba(147,51,234,0.08);color:var(--purple);border:1px solid rgba(147,51,234,0.25);}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;}
+.cgrid-item{border-radius:14px;overflow:hidden;border:1px solid var(--border);background:rgba(255,255,255,0.6);backdrop-filter:blur(16px);display:flex;flex-direction:column;justify-content:space-between;}
+.ci-body{padding:11px 13px;}
+.ci-title{font-size:12.5px;font-weight:700;color:var(--text);line-height:1.4;}
+#ans-modal,#material-doubts-modal,#stats-modal{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;background:rgba(252,228,214,0.6);backdrop-filter:blur(14px);}
+#ans-modal.on,#material-doubts-modal.on,#stats-modal.on{display:flex;}
+.am-box{background:rgba(255,255,255,0.9);border:1px solid var(--border);border-radius:22px;padding:28px;width:460px;max-width:92vw;box-shadow:0 24px 60px rgba(147,51,234,0.12);}
+.md-box{background:rgba(255,255,255,0.92);border:1px solid var(--border);border-radius:22px;padding:24px;width:520px;max-width:92vw;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(147,51,234,0.12);}
+.sort-bar{display:flex;gap:4px;background:rgba(255,255,255,0.4);border:1px solid var(--border);padding:4px;border-radius:10px;margin-bottom:14px;}
+.sort-pill{padding:5px 14px;font-size:11px;font-weight:700;color:var(--dim);border-radius:7px;background:transparent;cursor:pointer;border:none;font-family:var(--ff-body);transition:all 0.2s;}
+.sort-pill.active{background:white;color:var(--purple);box-shadow:0 2px 8px rgba(0,0,0,0.04);}
+.ptype-btn{background:transparent;color:var(--dim);font-weight:700;}
+.ptype-btn.on{background:white;color:var(--purple);box-shadow:0 2px 8px rgba(0,0,0,0.04);}
+.grade-opt-btn{width:34px;height:34px;border-radius:9px;border:1px solid var(--border2);background:rgba(255,255,255,0.7);color:var(--dim2);font-weight:800;font-size:13px;cursor:pointer;transition:all .15s;}
+.grade-opt-btn:hover{border-color:var(--purple);}
+.grade-opt-btn.sel{background:var(--purple);color:#fff;border-color:var(--purple);box-shadow:0 4px 10px rgba(147,51,234,0.3);}
+.trunc{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.breadcrumb{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--dim);margin-bottom:16px;flex-wrap:wrap;}
+.breadcrumb span{font-weight:700;cursor:pointer;transition:color .15s;}.breadcrumb span:hover{color:var(--text);}
+.breadcrumb i{font-size:9px;}
+.empty{text-align:center;padding:48px 20px;}
+.empty i{font-size:44px;color:rgba(147,51,234,0.15);display:block;margin-bottom:12px;}
+.empty p{font-size:13px;color:var(--dim);font-weight:500;}
+.poll-opt-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.poll-opt-row input[type=text]{flex:1;}
+.poll-opt-row input[type=radio]{accent-color:var(--purple);width:14px;height:14px;flex-shrink:0;}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:24px;}
+.stat-card{background:rgba(255,255,255,0.6);border:1px solid var(--border);border-radius:18px;padding:20px 22px;backdrop-filter:blur(20px);}
+.stat-card .lbl{font-family:var(--ff-ui);font-size:0.58rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--dim);margin-bottom:8px;}
+.stat-card .val{font-family:var(--ff-display);font-size:2.8rem;line-height:1;color:var(--text);}
+#toast-wrap{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);z-index:500;display:flex;flex-direction:column;gap:8px;align-items:center;}
+.toast{background:rgba(26,16,53,0.92);color:#fff;padding:9px 18px;border-radius:12px;font-size:12.5px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,0.25);}
+.subj-divider{font-family:var(--ff-ui);font-size:0.62rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--purple);margin:16px 0 8px;padding-bottom:6px;border-bottom:1px solid rgba(147,51,234,0.15);}
+.subj-divider:first-child{margin-top:0;}
+body.dark{--bg-a:#1a1035;--bg-b:#241640;--bg-c:#1c2440;--bg-d:#16241f;--surface:rgba(30,22,50,0.6);--surface2:rgba(30,22,50,0.8);--text:#f1edf9;--dim:#a599c2;--dim2:#c4bad9;--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.08);}
+body.dark input,body.dark textarea,body.dark select{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.1);color:var(--text);}
+body.dark .cmsg,body.dark .dc,body.dark .pc,body.dark .sess-card,body.dark .cgrid-item,body.dark .stat-card{background:rgba(255,255,255,0.04);}
+body.dark .am-box,body.dark .md-box{background:rgba(30,22,50,0.96);}
+</style>
+</head>
+<body>
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+<div id="toast-wrap"></div>
+
+<!-- LOGIN -->
+<div id="login-screen" style="position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(252,228,214,0.93),rgba(232,213,245,0.93));backdrop-filter:blur(20px);">
+  <div class="glass fu" style="border-radius:26px;padding:40px 36px;width:400px;max-width:92vw;position:relative;overflow:hidden;">
+    <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--purple),var(--orange),transparent);"></div>
+    <div style="text-align:center;margin-bottom:28px;">
+      <div style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,var(--purple),var(--orange));display:flex;align-items:center;justify-content:center;margin:0 auto 14px;box-shadow:0 8px 20px rgba(147,51,234,0.25);">
+        <i class="fa-solid fa-shield-halved" style="color:white;font-size:22px;"></i>
+      </div>
+      <div class="brand" style="font-size:1.25rem;">ASTRO<span>CORE</span></div>
+      <div style="font-size:10px;color:var(--dim);margin-top:5px;text-transform:uppercase;letter-spacing:.1em;font-family:var(--ff-ui);">Admin Panel</div>
+    </div>
+    <form id="login-form" style="display:flex;flex-direction:column;gap:10px;">
+      <input type="email" id="l-email" required placeholder="Admin email address">
+      <input type="password" id="l-pass" required placeholder="Password">
+      <button type="submit" id="l-btn" class="btn btn-p" style="width:100%;justify-content:center;padding:11px 20px;"><i class="fa-solid fa-unlock-keyhole"></i> Enter Admin Panel</button>
+      <p id="l-err" class="hidden" style="font-size:11.5px;color:var(--red);text-align:center;padding:7px;background:rgba(239,68,68,0.06);border-radius:8px;border:1px solid rgba(239,68,68,0.15);"></p>
+      <p id="l-reset-msg" class="hidden" style="font-size:11.5px;color:var(--green);text-align:center;padding:7px;background:rgba(16,185,129,0.06);border-radius:8px;border:1px solid rgba(16,185,129,0.15);"></p>
+      <button type="button" id="forgot-pass-btn" style="background:none;border:none;font-size:11.5px;color:var(--purple);font-weight:700;cursor:pointer;font-family:var(--ff-body);text-align:center;">Forgot password?</button>
+    </form>
+  </div>
+</div>
+
+<!-- ACCESS DENIED: shown when a signed-in account does NOT carry the admin custom claim -->
+<div id="access-denied" style="display:none;position:fixed;inset:0;z-index:999;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(252,228,214,0.93),rgba(232,213,245,0.93));backdrop-filter:blur(20px);">
+  <div class="glass fu" style="border-radius:26px;padding:40px 36px;width:400px;max-width:92vw;text-align:center;">
+    <div style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,var(--red),#dc2626);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 8px 20px rgba(239,68,68,0.25);">
+      <i class="fa-solid fa-ban" style="color:white;font-size:22px;"></i>
+    </div>
+    <div style="font-weight:800;font-size:1.05rem;margin-bottom:6px;">Not an admin account</div>
+    <p style="font-size:12.5px;color:var(--dim);line-height:1.6;margin-bottom:18px;"><span id="access-denied-email"></span> is signed in but doesn't have admin access. If this should be an admin account, ask an existing admin to grant it, or see the README's "First admin setup" section.</p>
+    <button onclick="doLogout()" class="btn btn-gh" style="width:100%;justify-content:center;"><i class="fa-solid fa-power-off"></i> Sign out</button>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="hidden" style="display:none;flex-direction:column;height:100vh;position:relative;z-index:1;">
+  <div id="topbar">
+    <div class="brand">ASTRO<span>CORE</span></div>
+    <div style="font-size:9px;color:var(--dim);margin-left:6px;border-left:1px solid var(--border2);padding-left:10px;text-transform:uppercase;letter-spacing:.08em;font-family:var(--ff-ui);">Admin Panel</div>
+    <div id="sync"><div id="sync-dot"></div><span id="sync-txt">Connected</span></div>
+    <button onclick="toggleTheme()" class="btn btn-gh btn-sm" id="theme-toggle-btn" style="padding:6px 10px;"><i class="fa-solid fa-moon"></i></button>
+    <img id="admin-av" src="" alt="">
+    <button onclick="doLogout()" class="btn btn-gh btn-sm" style="margin-left:6px;color:var(--red);"><i class="fa-solid fa-power-off"></i></button>
+  </div>
+
+  <div id="content-row">
+    <div id="main">
+
+      <!-- LIVE PAGE -->
+      <div id="page-live" class="page on">
+        <div id="live-split">
+          <div id="live-left">
+            <div style="padding:14px;border-bottom:1px solid var(--border);flex-shrink:0;">
+              <div style="font-family:var(--ff-ui);font-size:0.62rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--purple);margin-bottom:12px;"><i class="fa-solid fa-satellite-dish"></i> Start Live Session</div>
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                <input type="text" id="nl-title" placeholder="Session title...">
+                <input type="text" id="nl-url" placeholder="YouTube stream URL (optional)...">
+                <input type="text" id="nl-slides-url" placeholder="Google Slides link (optional)...">
+                <input type="text" id="nl-pdf-url" placeholder="PDF link (optional)...">
+                <select id="nl-folder" style="font-size:12.5px;"></select>
+                <button onclick="startLive()" class="btn btn-p" style="justify-content:center;width:100%;"><i class="fa-solid fa-circle-dot"></i> Go Live</button>
+                <p style="font-size:10px;color:var(--dim);line-height:1.5;">Add at least one link. If you add more than one, students get a switcher to move between Video / Slides / PDF.</p>
+              </div>
+            </div>
+            <div id="live-sessions-scroll"><div id="live-list"></div></div>
+          </div>
+
+          <div id="live-right">
+            <div id="live-empty" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--dim);text-align:center;padding:30px;">
+              <i class="fa-solid fa-tower-broadcast" style="font-size:2.5rem;opacity:0.2;margin-bottom:14px;"></i>
+              <p style="font-size:13px;font-weight:600;">Select an active session to manage</p>
+            </div>
+
+            <div id="live-ctrl" class="hidden" style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+              <div id="ctrl-header" style="flex-shrink:0;padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.4);">
+                <span class="bx bx-r"><span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--red);margin-right:3px;" class="lpulse"></span>LIVE</span>
+                <span id="ctrl-subj" class="bx bx-p"></span>
+                <span id="ctrl-title-txt" style="font-size:13px;font-weight:700;flex:1;" class="trunc"></span>
+                <span id="chat-ttl-note" style="font-size:9.5px;color:var(--dim);"><i class="fa-solid fa-clock"></i> Chat auto-clears after 30s</span>
+                <button onclick="endLive()" class="btn btn-r btn-sm"><i class="fa-solid fa-stop"></i> End Session</button>
+              </div>
+              <div class="ctab-row">
+                <button class="ctab on" onclick="setCTab('chat')" id="ct-chat">Chat</button>
+                <button class="ctab" onclick="setCTab('doubts')" id="ct-doubts">Doubts</button>
+                <button class="ctab" onclick="setCTab('polls')" id="ct-polls">Polls</button>
+                <button class="ctab" onclick="setCTab('tools')" id="ct-tools">Tools <span id="hand-raise-badge" class="hidden" style="background:var(--red);color:#fff;border-radius:99px;font-size:9px;padding:1px 5px;margin-left:3px;">0</span></button>
+              </div>
+              <div id="cv-chat" class="cview on">
+                <div id="pinned-msg-bar" class="hidden" style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(147,51,234,0.06);border-bottom:1px solid rgba(147,51,234,0.15);font-size:11.5px;">
+                  <i class="fa-solid fa-thumbtack" style="color:var(--purple);"></i>
+                  <span id="pinned-msg-text" style="flex:1;font-weight:600;" class="trunc"></span>
+                  <button onclick="unpinMessage()" class="btn btn-gh btn-xs" style="padding:2px 8px;">Unpin</button>
+                </div>
+                <div class="cscroll" id="live-chat-box"></div>
+              </div>
+              <div id="cv-doubts" class="cview">
+                <div class="sort-bar" style="margin:10px 12px 4px;">
+                  <button class="sort-pill active" id="ld-sort-latest" onclick="toggleLiveDoubtSorting('latest')">Latest</button>
+                  <button class="sort-pill" id="ld-sort-popular" onclick="toggleLiveDoubtSorting('popular')">Top Voted</button>
+                </div>
+                <div class="cscroll" id="live-doubt-box"></div>
+              </div>
+              <div id="cv-tools" class="cview">
+                <div class="cscroll" style="padding:14px;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border);">
+                    <div>
+                      <p style="font-size:12.5px;font-weight:700;">Slow Mode</p>
+                      <p style="font-size:10.5px;color:var(--dim);">Limits how often each student can send a chat message.</p>
+                    </div>
+                    <select id="slowmode-select" onchange="setSlowMode(this.value)" style="width:110px;">
+                      <option value="0">Off</option>
+                      <option value="10">10s</option>
+                      <option value="20">20s</option>
+                      <option value="30">30s</option>
+                    </select>
+                  </div>
+                  <div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border);">
+                    <p style="font-size:12.5px;font-weight:700;margin-bottom:8px;"><i class="fa-solid fa-hand" style="color:var(--amber);"></i> Hand Raise Queue</p>
+                    <div id="hand-raise-list" style="display:flex;flex-direction:column;gap:6px;"></div>
+                  </div>
+                  <div>
+                    <p style="font-size:12.5px;font-weight:700;margin-bottom:8px;"><i class="fa-solid fa-user-check" style="color:var(--green);"></i> Attendance (<span id="attendance-count">0</span>)</p>
+                    <div id="attendance-list" style="display:flex;flex-direction:column;gap:5px;max-height:200px;overflow-y:auto;"></div>
+                  </div>
+                </div>
+              </div>
+              <div id="cv-polls" class="cview">
+                <div style="flex:1;overflow-y:auto;padding:14px;">
+                  <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">
+                    <div style="display:flex;gap:4px;background:rgba(0,0,0,0.03);padding:3px;border-radius:10px;">
+                      <button type="button" class="btn-xs ptype-btn on" data-t="mcq" onclick="setPollType('mcq')" style="flex:1;justify-content:center;border-radius:7px;padding:7px;">MCQ</button>
+                      <button type="button" class="btn-xs ptype-btn" data-t="multi" onclick="setPollType('multi')" style="flex:1;justify-content:center;border-radius:7px;padding:7px;">Multi-Correct</button>
+                      <button type="button" class="btn-xs ptype-btn" data-t="integer" onclick="setPollType('integer')" style="flex:1;justify-content:center;border-radius:7px;padding:7px;">Integer</button>
+                      <button type="button" class="btn-xs ptype-btn" data-t="vote" onclick="setPollType('vote')" style="flex:1;justify-content:center;border-radius:7px;padding:7px;">Vote</button>
+                    </div>
+                    <p id="ptype-hint" style="font-size:10.5px;color:var(--dim);line-height:1.5;">Students pick one option. Correct answer is revealed after time ends — enter it then, so nothing leaks on a shared screen mid-poll.</p>
+                    <input type="text" id="pq" placeholder="Poll question...">
+                    <div id="poll-opts-block">
+                      <div class="poll-opt-row"><input type="text" id="po0" placeholder="Option A"></div>
+                      <div class="poll-opt-row"><input type="text" id="po1" placeholder="Option B"></div>
+                      <div class="poll-opt-row"><input type="text" id="po2" placeholder="Option C"></div>
+                      <div class="poll-opt-row"><input type="text" id="po3" placeholder="Option D"></div>
+                    </div>
+                    <div id="poll-integer-note" class="hidden" style="font-size:11.5px;color:var(--dim2);background:rgba(0,0,0,0.03);padding:9px 11px;border-radius:9px;">Students will type a numeric answer. No options needed.</div>
+                    <div id="poll-marks-block" style="display:flex;align-items:center;gap:8px;">
+                      <label style="display:flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;color:var(--dim2);"><input type="checkbox" id="pmarks-toggle" onchange="$('pmarks-fields').classList.toggle('hidden',!this.checked)" style="width:auto;accent-color:var(--purple);"> Negative marking</label>
+                      <div id="pmarks-fields" class="hidden" style="display:flex;gap:6px;flex:1;">
+                        <input type="number" id="pmarks-pos" value="4" placeholder="+marks" style="text-align:center;">
+                        <input type="number" id="pmarks-neg" value="1" placeholder="-marks" style="text-align:center;">
+                      </div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:5px;background:rgba(0,0,0,0.03);padding:10px;border-radius:10px;border:1px solid var(--border2);">
+                      <label style="font-size:11px;font-weight:700;color:var(--dim);text-transform:uppercase;">Select Timer Option</label>
+                      <div style="display:flex;gap:5px;">
+                        <button type="button" onclick="$('ptimer').value=30" class="btn btn-gh btn-xs" style="flex:1;justify-content:center;">30 Sec</button>
+                        <button type="button" onclick="$('ptimer').value=60" class="btn btn-gh btn-xs" style="flex:1;justify-content:center;">1 Min</button>
+                        <button type="button" onclick="$('ptimer').value=120" class="btn btn-gh btn-xs" style="flex:1;justify-content:center;">2 Min</button>
+                      </div>
+                      <div style="display:flex;gap:8px;align-items:center;margin-top:4px;">
+                        <span style="font-size:12px;color:var(--dim2);font-weight:600;white-space:nowrap;">Custom Seconds:</span>
+                        <input type="number" id="ptimer" value="30" style="width:100%;text-align:center;font-weight:700;padding:6px;">
+                      </div>
+                    </div>
+                    <div style="display:flex;gap:6px;">
+                      <button onclick="sendPoll()" id="send-poll-btn" class="btn btn-p" style="flex:1;justify-content:center;padding:10px;"><i class="fa-solid fa-paper-plane"></i> Send Poll</button>
+                      <button onclick="savePollTemplate()" class="btn btn-gh btn-sm" title="Save as template"><i class="fa-solid fa-bookmark"></i></button>
+                    </div>
+                    <div id="poll-templates-row" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+                  </div>
+                  <div style="height:1px;background:var(--border);margin-bottom:14px;"></div>
+                  <div id="live-polls-list"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTENT PAGE -->
+      <div id="page-content" class="page">
+        <div class="pscroll">
+          <div style="display:grid;grid-template-columns:300px 1fr;gap:16px;">
+            <div>
+              <div class="glass" style="border-radius:16px;padding:16px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+                  <span style="font-family:var(--ff-ui);font-size:0.62rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--dim);">Folders</span>
+                  <button onclick="showCreateFolder(null)" class="btn btn-gh btn-xs"><i class="fa-solid fa-folder-plus"></i> New Root</button>
+                </div>
+                <div id="folder-tree" class="ftree"></div>
+              </div>
+              <div class="glass" style="border-radius:16px;padding:16px;margin-top:12px;">
+                <select id="u-type" style="margin-bottom:8px;"><option value="video">Video Lecture</option><option value="slides">Google Slides</option><option value="pdf">PDF Notes</option></select>
+                <div id="u-folder-display" style="padding:9px 12px;font-size:11.5px;color:var(--dim);margin-bottom:8px;background:rgba(255,255,255,0.5);border:1px solid var(--border);border-radius:10px;">Select a folder first</div>
+                <input type="text" id="u-title" placeholder="Content title..." style="margin-bottom:8px;">
+                <input type="url" id="u-url" placeholder="URL..." style="margin-bottom:8px;">
+                <button onclick="uploadContent()" id="upload-btn" class="btn btn-p" style="width:100%;justify-content:center;"><i class="fa-solid fa-cloud-arrow-up"></i> Upload Content</button>
+              </div>
+              <div id="create-folder-box" class="hidden glass" style="border-radius:16px;padding:16px;margin-top:12px;">
+                <div id="parent-folder-info" style="font-size:10.5px;color:var(--dim);margin-bottom:8px;"></div>
+                <input type="text" id="new-folder-name" placeholder="Folder name..." style="margin-bottom:8px;">
+                <button onclick="doCreateFolder()" class="btn btn-p btn-xs" style="width:100%;justify-content:center;">Create Folder</button>
+              </div>
+            </div>
+            <div>
+              <div id="content-breadcrumb" class="breadcrumb"></div>
+              <input type="text" id="content-search" placeholder="Search content in this folder..." oninput="filterContentSearch(this.value)" style="margin-bottom:12px;">
+              <div id="content-grid" class="cgrid"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DOUBTS PAGE -->
+      <div id="page-doubts" class="page">
+        <div class="pscroll">
+          <div style="font-family:var(--ff-ui);font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--dim);margin-bottom:10px;">Global / Unlinked Doubts Feed</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
+            <div class="sort-bar" style="margin-bottom:0;">
+              <button class="sort-pill active" id="gd-sort-latest" onclick="toggleGlobalDoubtSorting('latest')">Latest</button>
+              <button class="sort-pill" id="gd-sort-popular" onclick="toggleGlobalDoubtSorting('popular')">Most Upvoted</button>
+            </div>
+            <div class="sort-bar" style="margin-bottom:0;">
+              <button class="sort-pill active" id="gd-filter-all" onclick="toggleGlobalDoubtFilter('all')">All</button>
+              <button class="sort-pill" id="gd-filter-unanswered" onclick="toggleGlobalDoubtFilter('unanswered')">Unanswered</button>
+            </div>
+          </div>
+          <div id="all-doubts-list"></div>
+        </div>
+      </div>
+
+      <!-- OVERVIEW PAGE -->
+      <div id="page-overview" class="page">
+        <div class="pscroll">
+          <div class="stat-grid">
+            <div class="stat-card"><div class="lbl" style="color:var(--purple);">Students</div><div class="val" id="stat-s">0</div></div>
+            <div class="stat-card"><div class="lbl" style="color:var(--orange);">Content</div><div class="val" id="stat-c">0</div></div>
+            <div class="stat-card"><div class="lbl" style="color:var(--green);">Doubts</div><div class="val" id="stat-d">0</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STUDENTS PAGE -->
+      <div id="page-students" class="page">
+        <div class="pscroll">
+          <div class="glass" style="border-radius:16px;overflow:hidden;">
+            <table style="width:100%;border-collapse:collapse;">
+              <thead><tr style="border-bottom:1px solid var(--border);background:rgba(255,255,255,0.4);">
+                <th style="padding:12px 16px;text-align:left;font-family:var(--ff-ui);font-size:9.5px;color:var(--dim);text-transform:uppercase;letter-spacing:0.1em;">Student</th>
+                <th style="padding:12px 16px;text-align:left;font-family:var(--ff-ui);font-size:9.5px;color:var(--dim);text-transform:uppercase;letter-spacing:0.1em;">Email</th>
+                <th style="padding:12px 16px;text-align:right;font-family:var(--ff-ui);font-size:9.5px;color:var(--dim);text-transform:uppercase;letter-spacing:0.1em;">Actions</th>
+              </tr></thead>
+              <tbody id="student-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADMINS / USER MANAGEMENT PAGE -->
+      <div id="page-admins" class="page">
+        <div class="pscroll">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+            <button onclick="refreshUserList()" class="btn btn-gh btn-sm"><i class="fa-solid fa-rotate"></i> Refresh</button>
+            <a href="#" onclick="exportStudentsCsv();return false;" class="btn btn-gh btn-sm"><i class="fa-solid fa-file-csv"></i> Export students CSV</a>
+            <div style="margin-left:auto;display:flex;gap:8px;">
+              <input type="email" id="promote-email" placeholder="user@email.com" style="width:220px;">
+              <button onclick="promoteByEmail()" class="btn btn-p btn-sm"><i class="fa-solid fa-user-shield"></i> Make admin</button>
+            </div>
+          </div>
+          <div class="glass" style="border-radius:16px;overflow:hidden;">
+            <table style="width:100%;border-collapse:collapse;">
+              <thead><tr style="border-bottom:1px solid var(--border);background:rgba(255,255,255,0.4);">
+                <th style="padding:12px 16px;text-align:left;font-family:var(--ff-ui);font-size:9.5px;color:var(--dim);text-transform:uppercase;letter-spacing:0.1em;">User</th>
+                <th style="padding:12px 16px;text-align:left;font-family:var(--ff-ui);font-size:9.5px;color:var(--dim);text-transform:uppercase;letter-spacing:0.1em;">Role</th>
+                <th style="padding:12px 16px;text-align:left;font-family:var(--ff-ui);font-size:9.5px;color:var(--dim);text-transform:uppercase;letter-spacing:0.1em;">Last sign-in</th>
+                <th style="padding:12px 16px;text-align:right;font-family:var(--ff-ui);font-size:9.5px;color:var(--dim);text-transform:uppercase;letter-spacing:0.1em;">Actions</th>
+              </tr></thead>
+              <tbody id="admin-users-tbody"><tr><td colspan="4" style="padding:20px;text-align:center;color:var(--dim);font-size:12px;">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROFILE PAGE -->
+      <div id="page-profile" class="page">
+        <div class="pscroll">
+          <div class="glass" style="border-radius:18px;padding:24px;max-width:420px;">
+            <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid var(--border);">
+              <img id="prof-av" src="" style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid var(--border);">
+              <div><div id="prof-name-d" style="font-weight:800;font-size:1.05rem;"></div><div id="prof-email-d" style="font-size:12px;color:var(--dim);margin-top:3px;"></div></div>
+            </div>
+            <input type="text" id="prof-name-inp" placeholder="Display name" style="margin-bottom:8px;">
+            <input type="url" id="prof-av-inp" placeholder="Photo URL" style="margin-bottom:12px;">
+            <button onclick="saveProfile()" class="btn btn-p" style="width:100%;justify-content:center;"><i class="fa-solid fa-floppy-disk"></i> Save Profile</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="dock-wrap">
+    <div class="dock">
+      <div class="dock-btn on" onclick="showPage('live')" data-dp="live"><div class="icon"><i class="fa-solid fa-tower-broadcast"></i></div><div class="label">Live</div></div>
+      <div class="dock-btn" onclick="showPage('content')" data-dp="content"><div class="icon"><i class="fa-solid fa-folder-tree"></i></div><div class="label">Content</div></div>
+      <div class="dock-btn" onclick="showPage('doubts')" data-dp="doubts"><div class="icon"><i class="fa-solid fa-circle-question"></i></div><div class="label">Doubts</div></div>
+      <div class="dock-btn" onclick="showPage('overview')" data-dp="overview"><div class="icon"><i class="fa-solid fa-chart-simple"></i></div><div class="label">Stats</div></div>
+      <div class="dock-btn" onclick="showPage('students')" data-dp="students"><div class="icon"><i class="fa-solid fa-user-group"></i></div><div class="label">Students</div></div>
+      <div class="dock-btn" onclick="showPage('admins')" data-dp="admins"><div class="icon"><i class="fa-solid fa-user-shield"></i></div><div class="label">Admins</div></div>
+      <div class="dock-btn" onclick="showPage('profile')" data-dp="profile"><div class="icon"><i class="fa-solid fa-sliders"></i></div><div class="label">Profile</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ANSWER MODAL -->
+<div id="ans-modal">
+  <div class="am-box">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <span style="font-size:14px;font-weight:800;color:var(--text);">Answer Doubt</span>
+      <button onclick="closeAns()" style="background:rgba(0,0,0,0.06);border:1px solid var(--border);border-radius:8px;padding:5px 10px;color:var(--dim);font-size:14px;">✕</button>
+    </div>
+    <div id="ans-q-text" style="font-size:13px;color:var(--dim2);padding:11px 13px;background:rgba(147,51,234,0.04);border-radius:10px;border:1px solid rgba(147,51,234,0.12);margin-bottom:14px;line-height:1.55;"></div>
+    <textarea id="ans-text" rows="4" placeholder="Type your answer here..."></textarea>
+    <div style="display:flex;gap:8px;margin-top:14px;">
+      <button onclick="submitAns()" class="btn btn-g" style="flex:1;justify-content:center;"><i class="fa-solid fa-check"></i> Submit Answer</button>
+    </div>
+    <input type="hidden" id="ans-doubt-id">
+  </div>
+</div>
+
+<!-- MATERIAL DOUBTS MODAL (doubts asked on a specific recorded lecture / PDF) -->
+<div id="material-doubts-modal">
+  <div class="md-box">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-shrink:0;">
+      <span id="md-title" style="font-size:14px;font-weight:800;color:var(--text);"></span>
+      <button onclick="closeMaterialDoubts()" style="background:rgba(0,0,0,0.06);border:1px solid var(--border);border-radius:8px;padding:5px 10px;color:var(--dim);font-size:14px;">✕</button>
+    </div>
+    <div id="md-list" style="overflow-y:auto;flex:1;"></div>
+  </div>
+</div>
+
+<!-- STUDENT STATS MODAL -->
+<div id="stats-modal">
+  <div class="md-box" style="width:400px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-shrink:0;">
+      <span id="stats-title" style="font-size:14px;font-weight:800;color:var(--text);"></span>
+      <button onclick="closeStudentStats()" style="background:rgba(0,0,0,0.06);border:1px solid var(--border);border-radius:8px;padding:5px 10px;color:var(--dim);font-size:14px;">✕</button>
+    </div>
+    <div id="stats-body" style="overflow-y:auto;flex:1;"></div>
+  </div>
+</div>
+
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
+import{getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut,updateProfile,sendPasswordResetEmail}from"https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
+import{getFirestore,collection,doc,addDoc,setDoc,getDocs,getDoc,onSnapshot,query,where,orderBy,updateDoc,deleteDoc,serverTimestamp,runTransaction}from"https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+
+// Same public client config as index.html — see the comment there for why this is safe
+// to ship in the page. The real secret (service account) lives only in Vercel env vars.
+const cfg={apiKey:"AIzaSyCxnF7VFBeIhzFzUueKpW2wQGg8_wCkm58",authDomain:"school-astra.firebaseapp.com",projectId:"school-astra",storageBucket:"school-astra.firebasestorage.app"};
+const app=initializeApp(cfg);
+const auth=getAuth(app);
+const db=getFirestore(app);
+
+let me=null,selSessId=null,selSessData=null;
+let chatUnsub=null,doubtUnsub=null,pollsUnsub=null,globalDoubtsUnsub=null,contentUnsub=null,mdDoubtsUnsub=null;
+let folders=[],selectedFolderId=null,pendingParentId=null;
+let liveDoubtSortCriteria='latest',globalDoubtSortCriteria='latest';
+let ansMode='global',ansSid=null;
+let chatPurgeInterval=null;
+const CHAT_TTL_MS=30000;
+
+const $=id=>document.getElementById(id);
+const esc=s=>(s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,'&#39;').replace(/"/g,'&quot;');
+// Safely embed a JS string literal inside a double-quoted onclick="" attribute. JSON.stringify()
+// produces a valid, fully-escaped JS string, but any literal " it contains still closes the HTML
+// attribute early — encoding those as &quot; keeps the whole thing intact through HTML parsing.
+// (esc() alone isn't enough here: esc()'d text wrapped in onclick="fn('...')" still breaks on an
+// apostrophe, since the entity only gets decoded back to a literal ' after the attribute is parsed.)
+const attrStr=v=>JSON.stringify(v==null?'':v).replace(/"/g,'&quot;');
+// Same idea, for the few places that use a single-quoted onclick='' attribute.
+const attrStr1=v=>JSON.stringify(v==null?'':v).replace(/'/g,'&#39;');
+function thumb(url){const e=embedUrl(url);const id=e.split('/embed/')[1];return id?`https://img.youtube.com/vi/${id}/mqdefault.jpg`:'';}
+function embedUrl(url){if(!url)return'';if(url.includes('youtube.com/watch')){try{return'https://www.youtube.com/embed/'+new URL(url).searchParams.get('v');}catch(e){return url;}}if(url.includes('youtu.be/'))return'https://www.youtube.com/embed/'+url.split('youtu.be/')[1].split('?')[0];return url;}
+function setSync(s,msg){const el=$('sync'),dot=$('sync-dot'),txt=$('sync-txt');el.classList.remove('busy','err');if(s==='busy'){el.classList.add('busy');txt.textContent='Saving…';}else if(s==='err'){el.classList.add('err');txt.textContent=msg||'Sync error';}else{txt.textContent='Connected';}}
+function toast(msg){const wrap=$('toast-wrap');const t=document.createElement('div');t.className='toast fu';t.innerText=msg;wrap.appendChild(t);setTimeout(()=>t.remove(),3200);}
+function timeAgo(ts){if(!ts)return'';const ms=ts.toMillis?ts.toMillis():ts;const diff=Math.max(0,Date.now()-ms);const m=Math.floor(diff/60000);if(m<1)return'just now';if(m<60)return m+'m ago';const h=Math.floor(m/60);if(h<24)return h+'h ago';return Math.floor(h/24)+'d ago';}
+async function safeWrite(fn){setSync('busy');try{await fn();setSync('ok');}catch(err){console.error(err);setSync('err',err.code||'write failed');toast('Action failed: '+(err.message||err));}}
+function onErr(err){console.error(err);setSync('err','listener error');}
+
+window.showPage=p=>{
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('on'));
+  document.querySelectorAll('.dock-btn').forEach(el=>el.classList.remove('on'));
+  $('page-'+p).classList.add('on');
+  const di=document.querySelector(`.dock-btn[data-dp="${p}"]`);if(di)di.classList.add('on');
+  if(p==='admins') refreshUserList();
+};
+
+$('login-form').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const email=$('l-email').value,pass=$('l-pass').value;
+  $('l-btn').disabled=true;$('l-err').classList.add('hidden');
+  try{
+    // Any account registered in the student portal (same email/password) can enter here —
+    // by design, for this single-owner small project. No separate admin role is enforced.
+    await signInWithEmailAndPassword(auth,email,pass);
+  }catch(err){$('l-err').textContent=err.message;$('l-err').classList.remove('hidden');}
+  $('l-btn').disabled=false;
+});
+window.doLogout=()=>signOut(auth);
+
+$('forgot-pass-btn').addEventListener('click', async ()=>{
+  const email=$('l-email').value.trim();
+  if(!email){ $('l-err').textContent='Enter your email above first.'; $('l-err').classList.remove('hidden'); return; }
+  try{
+    await sendPasswordResetEmail(auth,email);
+    $('l-err').classList.add('hidden');
+    $('l-reset-msg').textContent='Reset link sent to '+email+'. Check your inbox.';
+    $('l-reset-msg').classList.remove('hidden');
+  }catch(err){ $('l-reset-msg').classList.add('hidden'); $('l-err').textContent=err.message; $('l-err').classList.remove('hidden'); }
+});
+
+// Dark mode — preference is remembered per-account (users/{uid}.theme).
+function applyTheme(t){ document.body.classList.toggle('dark', t==='dark'); const i=$('theme-toggle-btn')?.querySelector('i'); if(i) i.className = t==='dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon'; }
+window.toggleTheme=async()=>{
+  const next = document.body.classList.contains('dark') ? 'light' : 'dark';
+  applyTheme(next);
+  if(me) await safeWrite(async()=>{ await setDoc(doc(db,'users',me.uid),{theme:next},{merge:true}); });
+};
+
+// Returns the cached ID token for authenticated API calls (list-users, set-role, etc).
+// forceRefresh=true is used right after login so a just-granted/just-revoked admin claim
+// is picked up immediately instead of waiting up to an hour for the token to naturally expire.
+window.getAdminIdToken=(forceRefresh=false)=> me ? me.getIdToken(forceRefresh) : Promise.resolve(null);
+
+onAuthStateChanged(auth,async user=>{
+  if(user){
+    // SECURITY: admin access is decided ONLY by the Firebase Auth custom claim "admin",
+    // which is set exclusively by our server (api/admin/*.js) using the Admin SDK — never
+    // by anything writable from the browser. Any signed-in account can reach this point,
+    // so we must verify the claim before showing any dashboard content or running any
+    // Firestore write. forceRefresh=true so a claim granted moments ago is seen right away.
+    let claims;
+    try{ claims=(await user.getIdTokenResult(true)).claims; }
+    catch(e){ console.error(e); claims={}; }
+
+    if(claims.admin!==true){
+      $('login-screen').style.display='none';
+      $('dashboard').style.display='none';
+      $('access-denied').style.display='flex';
+      $('access-denied-email').textContent=user.email;
+      return;
+    }
+    $('access-denied').style.display='none';
+
+    // Ensure a users/{uid} profile doc exists (in case this account was never opened in the student app).
+    try{
+      const uDoc=await getDoc(doc(db,'users',user.uid));
+      if(!uDoc.exists()) await setDoc(doc(db,'users',user.uid),{role:'admin',email:user.email,displayName:user.displayName||user.email.split('@')[0]});
+      else applyTheme(uDoc.data().theme || 'light');
+    }catch(e){ console.error(e); }
+    me=user;$('login-screen').style.display='none';
+    $('dashboard').style.display='flex';$('dashboard').classList.remove('hidden');
+    const name=user.displayName||'Admin';
+    const pfp=user.photoURL||`https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=f3e8ff&color=9333ea&bold=true`;
+    $('admin-av').src=pfp;$('prof-av').src=pfp;
+    $('prof-name-d').textContent=name;$('prof-email-d').textContent=user.email;
+    $('prof-name-inp').value=name;$('prof-av-inp').value=user.photoURL||'';
+    initApp();
+  }else{
+    $('login-screen').style.display='flex';$('dashboard').style.display='none';
+    $('access-denied').style.display='none';
+    if(chatPurgeInterval) clearInterval(chatPurgeInterval);
+  }
+});
+
+function initApp(){loadFolders();bindLiveSessions();bindAllDoubts();bindStudents();bindStats();bindPollTemplates();}
+
+// FOLDERS
+async function loadFolders(){
+  try{
+    const snap=await getDocs(collection(db,'folders'));
+    folders=[];snap.forEach(ds=>folders.push({id:ds.id,...ds.data()}));
+    renderFolderTree();updateFolderSelects();
+  }catch(err){onErr(err);}
+}
+
+function renderFolderTree(){
+  const tree=$('folder-tree');tree.innerHTML='';
+  const roots=folders.filter(f=>!f.parentId);
+  if(!roots.length){tree.innerHTML='<p style="font-size:12px;color:var(--dim);padding:8px;font-style:italic;">No folders yet. Create one above.</p>';return;}
+  roots.forEach(f=>{tree.appendChild(makeFolderNode(f));});
+}
+
+function makeFolderNode(f){
+  const node=document.createElement('div');
+  node.className='fnode';node.id='node-'+f.id;
+  const children=folders.filter(x=>x.parentId===f.id);
+  const head=document.createElement('div');
+  head.className='fnode-head';
+  if(selectedFolderId===f.id) head.classList.add('sel');
+  head.innerHTML=`
+    <i class="fa-solid ${children.length?'fa-folder-tree':'fa-folder'}" style="color:var(--purple);font-size:11px;"></i>
+    <span style="flex:1;" class="trunc">${esc(f.name)}</span>
+    <button class="btn-gh btn-xs" style="padding:2px 6px;border-radius:5px;font-size:10px;" title="Add subfolder"><i class="fa-solid fa-plus"></i></button>
+    <button class="btn-gh btn-xs" style="padding:2px 6px;border-radius:5px;font-size:10px;color:var(--red);" title="Delete folder"><i class="fa-solid fa-trash"></i></button>
+    ${children.length?'<i class="fa-solid fa-chevron-right arrow"></i>':''}
+  `;
+  head.addEventListener('click',(e)=>{e.stopPropagation();selectFolder(f.id);node.classList.toggle('open');});
+  head.querySelectorAll('button')[0].addEventListener('click',(e)=>{e.stopPropagation();showCreateFolder(f.id);});
+  head.querySelectorAll('button')[1].addEventListener('click',(e)=>{e.stopPropagation();deleteFolder(f.id);});
+  node.appendChild(head);
+  if(children.length){
+    const childWrap=document.createElement('div');childWrap.className='fnode-children';
+    children.forEach(c=>{childWrap.appendChild(makeFolderNode(c));});
+    node.appendChild(childWrap);
+  }
+  return node;
+}
+
+window.selectFolder=fid=>{
+  selectedFolderId=fid;
+  document.querySelectorAll('.fnode-head').forEach(el=>el.classList.remove('sel'));
+  const match=document.querySelector(`#node-${fid} > .fnode-head`);
+  if(match)match.classList.add('sel');
+  const path=getFolderPath(fid);
+  $('u-folder-display').textContent=path.map(x=>x.name).join(' / ');
+  renderContentBreadcrumb(path);loadFolderContent(fid);
+};
+
+function getFolderPath(fid){const f=folders.find(x=>x.id===fid);if(!f)return[];if(f.parentId)return[...getFolderPath(f.parentId),f];return[f];}
+
+window.showCreateFolder=parentId=>{
+  pendingParentId=parentId;$('create-folder-box').classList.remove('hidden');$('new-folder-name').value='';
+  $('parent-folder-info').textContent=parentId?'Subfolder inside: '+(folders.find(f=>f.id===parentId)?.name||''):'New root folder';
+  $('new-folder-name').focus();
+};
+
+window.doCreateFolder=async()=>{
+  const name=$('new-folder-name').value.trim();if(!name)return;
+  await safeWrite(async()=>{
+    await addDoc(collection(db,'folders'),{name,parentId:pendingParentId||null,createdAt:serverTimestamp()});
+    $('create-folder-box').classList.add('hidden');await loadFolders();
+  });
+};
+
+window.deleteFolder=async fid=>{
+  if(!confirm('Delete this folder and all its contents?'))return;
+  await safeWrite(async()=>{await deleteDoc(doc(db,'folders',fid));await loadFolders();});
+};
+
+function updateFolderSelects(){
+  const sel=$('nl-folder');sel.innerHTML='<option value="">Select folder...</option>';
+  function genOpts(parentId,depth){
+    folders.filter(f=>(f.parentId||null)===(parentId||null)).forEach(f=>{
+      const opt=document.createElement('option');opt.value=f.id;opt.textContent='  '.repeat(depth)+f.name;sel.appendChild(opt);genOpts(f.id,depth+1);
+    });
+  }
+  genOpts(null,0);
+}
+
+function renderContentBreadcrumb(path){
+  $('content-breadcrumb').innerHTML=path.map((f,i)=>`<span onclick="selectFolder('${f.id}')">${esc(f.name)}</span>${i<path.length-1?'<i class="fa-solid fa-chevron-right"></i>':''}`).join('');
+}
+
+// Single-field query (folderId==) + client-side sort — avoids needing a composite index.
+let currentFolderItems=[];
+function loadFolderContent(fid){
+  if(contentUnsub) contentUnsub();
+  const grid=$('content-grid');
+  grid.innerHTML='';
+  $('content-search').value='';
+  const q = query(collection(db,'materials'), where('folderId','==',fid));
+  contentUnsub = onSnapshot(q, snap=>{
+    let items = [];
+    snap.forEach(ds => items.push({id: ds.id, ...ds.data()}));
+    items.sort((a,b) => {
+      const tA = a.timestamp?.toMillis ? a.timestamp.toMillis() : (a.timestamp || 0);
+      const tB = b.timestamp?.toMillis ? b.timestamp.toMillis() : (b.timestamp || 0);
+      return tB - tA;
+    });
+    currentFolderItems = items;
+    renderContentGrid(items);
+  }, onErr);
+}
+window.filterContentSearch=(term)=>{
+  term=term.trim().toLowerCase();
+  const filtered = term ? currentFolderItems.filter(d=>(d.title||'').toLowerCase().includes(term)) : currentFolderItems;
+  renderContentGrid(filtered);
+};
+function renderContentGrid(items){
+  const grid=$('content-grid');
+  grid.innerHTML='';
+  if(!items.length){grid.innerHTML='<div class="empty" style="grid-column:1/-1"><i class="fa-solid fa-folder-open"></i><p>No content matches.</p></div>';return;}
+  {
+    items.forEach(d=>{
+      const t=thumb(d.url||'');
+      if(d.type==='video'){
+        grid.innerHTML+=`<div class="cgrid-item fu">
+          <div class="vthumb" style="padding-bottom:52%;">${t?`<img src="${t}" alt="">`:''}
+            <div class="vover"></div>
+            <div class="vtl"><span class="bx bx-b">Lecture</span></div>
+          </div>
+          <div class="ci-body">
+            <div class="ci-title" style="margin-bottom:6px;">${esc(d.title)}</div>
+            <div style="font-size:11px;color:var(--dim);word-break:break-all;background:rgba(0,0,0,0.03);padding:6px;border-radius:6px;max-height:50px;overflow-y:auto;">${esc(d.url)}</div>
+          </div>
+          <div style="padding:0 10px 10px;display:flex;gap:4px;">
+            <button onclick="openMaterialDoubts(${attrStr(d.id)},${attrStr(d.title)})" class="btn btn-gh btn-xs" style="flex:1;justify-content:center;"><i class="fa-solid fa-circle-question"></i> Doubts</button>
+            <button onclick="deleteContent('${d.id}')" class="btn btn-gh btn-xs" style="color:var(--red);"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        </div>`;
+      }else if(d.type==='slides'){
+        grid.innerHTML+=`<div class="cgrid-item fu">
+          <div class="ci-body" style="padding:16px;">
+            <div style="width:38px;height:38px;border-radius:10px;background:rgba(245,158,11,0.1);display:flex;align-items:center;justify-content:center;color:var(--amber);font-size:1.1rem;margin-bottom:10px;"><i class="fa-solid fa-display"></i></div>
+            <div class="ci-title" style="margin-bottom:6px;">${esc(d.title)}</div>
+            <div style="font-size:11px;color:var(--dim);word-break:break-all;background:rgba(0,0,0,0.03);padding:6px;border-radius:6px;max-height:50px;overflow-y:auto;">${esc(d.url)}</div>
+          </div>
+          <div style="padding:0 10px 10px;display:flex;gap:4px;">
+            <button onclick="openMaterialDoubts(${attrStr(d.id)},${attrStr(d.title)})" class="btn btn-gh btn-xs" style="flex:1;justify-content:center;"><i class="fa-solid fa-circle-question"></i> Doubts</button>
+            <button onclick="deleteContent('${d.id}')" class="btn btn-gh btn-xs" style="color:var(--red);"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        </div>`;
+      }else{
+        grid.innerHTML+=`<div class="cgrid-item fu">
+          <div class="ci-body" style="padding:16px;">
+            <div style="width:38px;height:38px;border-radius:10px;background:rgba(147,51,234,0.1);display:flex;align-items:center;justify-content:center;color:var(--purple);font-size:1.1rem;margin-bottom:10px;"><i class="fa-solid fa-file-pdf"></i></div>
+            <div class="ci-title" style="margin-bottom:6px;">${esc(d.title)}</div>
+            <div style="font-size:11px;color:var(--dim);word-break:break-all;background:rgba(0,0,0,0.03);padding:6px;border-radius:6px;max-height:50px;overflow-y:auto;">${esc(d.url)}</div>
+          </div>
+          <div style="padding:0 10px 10px;display:flex;gap:4px;">
+            <a href="${esc(d.url)}" target="_blank" class="btn btn-gh btn-xs" style="flex:1;justify-content:center;text-decoration:none;"><i class="fa-solid fa-external-link"></i> Open</a>
+            <button onclick="openMaterialDoubts(${attrStr(d.id)},${attrStr(d.title)})" class="btn btn-gh btn-xs"><i class="fa-solid fa-circle-question"></i></button>
+            <button onclick="deleteContent('${d.id}')" class="btn btn-gh btn-xs" style="color:var(--red);"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        </div>`;
+      }
+    });
+  }
+}
+
+window.uploadContent=async()=>{
+  if(!selectedFolderId){alert('Please select a folder first.');return;}
+  const url=$('u-url').value.trim(),title=$('u-title').value.trim(),type=$('u-type').value;
+  if(!url||!title){alert('Please fill in both title and URL.');return;}
+  const folderName=folders.find(f=>f.id===selectedFolderId)?.name||'';
+  $('upload-btn').disabled=true;
+  await safeWrite(async()=>{
+    await addDoc(collection(db,'materials'),{folderId:selectedFolderId,folderName,type,title,url,timestamp:serverTimestamp()});
+    $('u-url').value='';$('u-title').value='';
+  });
+  $('upload-btn').disabled=false;
+};
+
+window.deleteContent=async id=>{
+  if(!confirm('Delete this content?'))return;
+  await safeWrite(async()=>{await deleteDoc(doc(db,'materials',id));});
+};
+
+// ---- Doubts on a specific recorded lecture / PDF (materials/{id}/doubts subcollection) ----
+window.openMaterialDoubts=(materialId,title)=>{
+  $('md-title').innerText='Doubts — '+title;
+  $('material-doubts-modal').classList.add('on');
+  if(mdDoubtsUnsub) mdDoubtsUnsub();
+  const list=$('md-list');list.innerHTML='';
+  mdDoubtsUnsub=onSnapshot(query(collection(db,'materials/'+materialId+'/doubts'),orderBy('timestamp','desc')),snap=>{
+    list.innerHTML='';
+    if(snap.empty){list.innerHTML='<div class="empty"><i class="fa-solid fa-circle-question"></i><p>No doubts on this content yet.</p></div>';return;}
+    const items=snap.docs.map(ds=>({id:ds.id,...ds.data()}));
+    items.sort((a,b)=>(!!b.urgent)-(!!a.urgent));
+    items.forEach(d=>{
+      const isAns=!!d.answer;
+      list.innerHTML+=`<div class="dc ${isAns?'ans':''} fu" style="${d.urgent?'border-left-color:var(--red);':''}">
+        <div class="dn">${esc(d.studentName)} ${d.urgent?'<span class="bx bx-r" style="font-size:8px;"><i class="fa-solid fa-triangle-exclamation"></i> Urgent</span>':''} <span style="color:var(--dim);font-weight:600;">· ${timeAgo(d.timestamp)}</span></div>
+        <div class="dt">${esc(d.description)}</div>
+        <div style="font-size:10.5px;color:var(--purple);font-weight:700;margin:6px 0;"><i class="fa-solid fa-caret-up"></i> ${d.upvotes||0} upvotes</div>
+        ${isAns?`<div class="da"><div class="da-l">Answer:</div><div class="da-t">${esc(d.answer)}</div></div>`:''}
+        <div class="dc-actions">
+          <button onclick="openAnsMaterial(${attrStr(d.id)},${attrStr(d.description||'')},${attrStr(materialId)})" class="btn btn-g btn-xs"><i class="fa-solid fa-reply"></i> Answer</button>
+          <button onclick="deleteMaterialDoubt('${d.id}','${materialId}')" class="btn btn-gh btn-xs" style="color:var(--red);"><i class="fa-solid fa-trash"></i> Delete</button>
+        </div>
+      </div>`;
+    });
+  }, onErr);
+};
+window.closeMaterialDoubts=()=>{$('material-doubts-modal').classList.remove('on');if(mdDoubtsUnsub)mdDoubtsUnsub();};
+window.openAnsMaterial=(doubtId,text,materialId)=>{ansMode='material';ansSid=materialId;$('ans-doubt-id').value=doubtId;$('ans-q-text').textContent=text;$('ans-text').value='';$('ans-modal').classList.add('on');};
+window.deleteMaterialDoubt=async(id,materialId)=>{
+  if(!confirm('Delete this doubt?'))return;
+  await safeWrite(async()=>{await deleteDoc(doc(db,'materials/'+materialId+'/doubts',id));});
+};
+
+// LIVE SESSIONS
+function bindLiveSessions(){
+  onSnapshot(query(collection(db,'live_sessions'),where('active','==',true)),snap=>{
+    const list=$('live-list');list.innerHTML='';
+    if(snap.empty){list.innerHTML='<div class="empty"><i class="fa-solid fa-tower-broadcast"></i><p>No active sessions</p></div>';return;}
+    snap.forEach(ds=>{
+      const d=ds.data();const t=thumb(d.url||'');
+      const card=document.createElement('div');
+      card.className='sess-card'+(selSessId===ds.id?' sel':'');
+      card.dataset.sid=ds.id;
+      card.innerHTML=`
+        <div class="vthumb">
+          ${t?`<img src="${t}" alt="">`:''}
+          <div class="vover"></div>
+          <div class="vtl"><span class="bx bx-r"><span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--red);margin-right:3px;" class="lpulse"></span>LIVE</span></div>
+          <div class="vbl"><div style="font-size:13px;font-weight:700;color:white;" class="trunc">${esc(d.title)}</div></div>
+        </div>
+        <div style="padding:9px 12px;display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-size:11px;color:var(--dim);"><i class="fa-solid fa-folder-tree" style="margin-right:4px;"></i>${esc(d.folderName)}</span>
+          <button onclick="event.stopPropagation();deleteLiveSession('${ds.id}')" class="btn btn-gh btn-xs" style="color:var(--red);padding:3px 8px;"><i class="fa-solid fa-trash"></i></button>
+        </div>`;
+      card.addEventListener('click',()=>selectSession(ds.id,d));
+      list.appendChild(card);
+    });
+  }, onErr);
+}
+
+let sessDocUnsub=null,attendanceUnsub=null;
+function selectSession(sid,data){
+  selSessId=sid;selSessData=data;
+  document.querySelectorAll('.sess-card').forEach(c=>c.classList.toggle('sel',c.dataset.sid===sid));
+  $('live-empty').style.display='none';$('live-ctrl').classList.remove('hidden');
+  $('ctrl-title-txt').textContent=data.title;$('ctrl-subj').textContent=data.folderName;
+  setCTab('chat');bindLiveChat(sid);bindLiveDoubts(sid);bindLivePolls(sid);startChatPurge(sid);
+  bindSessionDoc(sid);bindAttendance(sid);
+}
+
+function bindSessionDoc(sid){
+  if(sessDocUnsub)sessDocUnsub();
+  sessDocUnsub=onSnapshot(doc(db,'live_sessions',sid),ds=>{
+    if(!ds.exists())return;
+    const d=ds.data();
+    // Pinned message
+    if(d.pinnedMessage){ $('pinned-msg-bar').classList.remove('hidden'); $('pinned-msg-text').textContent=d.pinnedMessage.sender+': '+d.pinnedMessage.text; }
+    else{ $('pinned-msg-bar').classList.add('hidden'); }
+    // Slow mode select stays in sync
+    $('slowmode-select').value=(d.slowModeSeconds||0)+'';
+    // Hand raises
+    const raises=d.handRaises||{};
+    const entries=Object.keys(raises).map(uid=>({uid,...raises[uid]})).sort((a,b)=>(a.timestamp||0)-(b.timestamp||0));
+    $('hand-raise-badge').classList.toggle('hidden',entries.length===0);
+    $('hand-raise-badge').textContent=entries.length;
+    const hlist=$('hand-raise-list');
+    hlist.innerHTML = entries.length ? entries.map(e=>`<div class="pc-lb-row fu" style="margin-bottom:0;"><i class="fa-solid fa-hand" style="color:var(--amber);margin-right:6px;"></i><span style="flex:1;font-weight:600;">${esc(e.studentName)}</span><button onclick="clearHandRaise('${e.uid}')" class="btn btn-gh btn-xs" style="padding:2px 8px;">Clear</button></div>`).join('') : '<p style="font-size:11px;color:var(--dim);font-style:italic;">No hands raised.</p>';
+  }, onErr);
+}
+
+function bindAttendance(sid){
+  if(attendanceUnsub)attendanceUnsub();
+  attendanceUnsub=onSnapshot(collection(db,'live_sessions/'+sid+'/attendance'),snap=>{
+    $('attendance-count').textContent=snap.size;
+    const list=$('attendance-list');list.innerHTML='';
+    if(snap.empty){list.innerHTML='<p style="font-size:11px;color:var(--dim);font-style:italic;">No one has joined yet.</p>';return;}
+    let items=[];snap.forEach(ds=>items.push(ds.data()));
+    items.sort((a,b)=>(a.joinedAt?.toMillis?.()||0)-(b.joinedAt?.toMillis?.()||0));
+    items.forEach(d=>{list.innerHTML+=`<div style="font-size:11.5px;padding:5px 9px;background:rgba(255,255,255,0.5);border:1px solid var(--border);border-radius:8px;">${esc(d.studentName)}</div>`;});
+  }, onErr);
+}
+
+window.clearHandRaise=async uid=>{
+  await safeWrite(async()=>{ await updateDoc(doc(db,'live_sessions',selSessId),{['handRaises.'+uid]:null}); });
+};
+window.setSlowMode=async seconds=>{
+  await safeWrite(async()=>{ await updateDoc(doc(db,'live_sessions',selSessId),{slowModeSeconds:parseInt(seconds)||0}); });
+};
+window.unpinMessage=async()=>{
+  await safeWrite(async()=>{ await updateDoc(doc(db,'live_sessions',selSessId),{pinnedMessage:null}); });
+};
+window.pinChatMessage=async(text,sender)=>{
+  await safeWrite(async()=>{ await updateDoc(doc(db,'live_sessions',selSessId),{pinnedMessage:{text,sender,timestamp:Date.now()}}); });
+};
+
+window.startLive=async()=>{
+  const url=$('nl-url').value.trim(),pdfUrl=$('nl-pdf-url').value.trim(),slidesUrl=$('nl-slides-url').value.trim();
+  const title=$('nl-title').value.trim(),folderId=$('nl-folder').value;
+  if(!title||!folderId){alert('Please fill in the session title and folder.');return;}
+  if(!url&&!pdfUrl&&!slidesUrl){alert('Add at least one link — video, slides, or PDF.');return;}
+  const folderName=folders.find(f=>f.id===folderId)?.name||'General';
+  await safeWrite(async()=>{
+    await addDoc(collection(db,'live_sessions'),{url,pdfUrl,slidesUrl,title,folderId,folderName,active:true,createdAt:serverTimestamp()});
+    $('nl-url').value='';$('nl-pdf-url').value='';$('nl-slides-url').value='';$('nl-title').value='';$('nl-folder').value='';
+  });
+};
+
+window.endLive=async()=>{
+  if(!selSessId||!confirm('End this live session? Doubts move to the recording — chat and polls are wiped.'))return;
+  const sid=selSessId;
+  await safeWrite(async()=>{
+    const d=selSessData;const targetId=d.folderId;
+    if(targetId){
+      const newMat=await addDoc(collection(db,'materials'),{folderId:targetId,folderName:d.folderName,type:'video',title:'[Recorded] '+d.title,url:d.url||'',pdfUrl:d.pdfUrl||'',slidesUrl:d.slidesUrl||'',timestamp:serverTimestamp(),fromLiveSession:sid});
+      const doubtsSnap=await getDocs(collection(db,'live_sessions/'+sid+'/doubts'));
+      await Promise.all(doubtsSnap.docs.map(dDoc=>addDoc(collection(db,'materials/'+newMat.id+'/doubts'),{...dDoc.data()})));
+    }
+    // Wipe chat, polls and attendance now that the session is over — only doubts survive (moved above).
+    const [chatSnap,pollSnap,liveDoubtSnap,attSnap]=await Promise.all([
+      getDocs(collection(db,'live_sessions/'+sid+'/chats')),
+      getDocs(collection(db,'live_sessions/'+sid+'/polls')),
+      getDocs(collection(db,'live_sessions/'+sid+'/doubts')),
+      getDocs(collection(db,'live_sessions/'+sid+'/attendance'))
+    ]);
+    await Promise.all([
+      ...chatSnap.docs.map(c=>deleteDoc(c.ref).catch(()=>{})),
+      ...pollSnap.docs.map(p=>deleteDoc(p.ref).catch(()=>{})),
+      ...liveDoubtSnap.docs.map(dd=>deleteDoc(dd.ref).catch(()=>{})),
+      ...attSnap.docs.map(a=>deleteDoc(a.ref).catch(()=>{}))
+    ]);
+    await updateDoc(doc(db,'live_sessions',sid),{active:false,endedAt:serverTimestamp(),pinnedMessage:null,handRaises:{},slowModeSeconds:0});
+    if(chatPurgeInterval){clearInterval(chatPurgeInterval);chatPurgeInterval=null;}
+    selSessId=null;selSessData=null;
+    $('live-ctrl').classList.add('hidden');$('live-empty').style.display='';
+    if(chatUnsub)chatUnsub();if(doubtUnsub)doubtUnsub();if(pollsUnsub)pollsUnsub();
+    if(sessDocUnsub)sessDocUnsub();if(attendanceUnsub)attendanceUnsub();
+  });
+};
+
+window.deleteLiveSession=async id=>{
+  if(!confirm('Delete this live session permanently?'))return;
+  await safeWrite(async()=>{
+    await updateDoc(doc(db,'live_sessions',id),{active:false,endedAt:serverTimestamp()});
+    if(selSessId===id){selSessId=null;selSessData=null;$('live-ctrl').classList.add('hidden');$('live-empty').style.display='';if(chatPurgeInterval)clearInterval(chatPurgeInterval);}
+  });
+};
+
+function bindLiveChat(sid){
+  if(chatUnsub)chatUnsub();
+  const box=$('live-chat-box');box.innerHTML='';
+  chatUnsub=onSnapshot(query(collection(db,'live_sessions/'+sid+'/chats'),orderBy('timestamp','asc')),snap=>{
+    box.innerHTML='';
+    if(snap.empty){box.innerHTML='<div class="empty"><i class="fa-regular fa-comment"></i><p>No messages yet</p></div>';return;}
+    snap.forEach(ds=>{const d=ds.data();box.innerHTML+=`<div class="cmsg fu" style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px;"><div style="flex:1;"><div class="csender">${esc(d.sender)}</div>${esc(d.message)}</div><button onclick='pinChatMessage(${attrStr1(d.message)},${attrStr1(d.sender)})' title="Pin" style="background:none;border:none;color:var(--dim);cursor:pointer;font-size:11px;flex-shrink:0;"><i class="fa-solid fa-thumbtack"></i></button></div>`;});
+    box.scrollTop=box.scrollHeight;
+  }, onErr);
+}
+
+// Chat auto-clears after 30s. Runs on a 4s tick, fire-and-forget deletes are batched
+// via Promise.all instead of the old dangling forEach(async...) pattern.
+function startChatPurge(sid){
+  if(chatPurgeInterval) clearInterval(chatPurgeInterval);
+  chatPurgeInterval=setInterval(async()=>{
+    try{
+      const snap=await getDocs(collection(db,'live_sessions/'+sid+'/chats'));
+      const cutoff=Date.now()-CHAT_TTL_MS;
+      const dels=[];
+      snap.forEach(chatDoc=>{
+        const d=chatDoc.data();
+        const ms=d.timestamp?.toMillis?d.timestamp.toMillis():0;
+        if(ms&&ms<cutoff) dels.push(deleteDoc(doc(db,'live_sessions/'+sid+'/chats',chatDoc.id)).catch(()=>{}));
+      });
+      if(dels.length) await Promise.all(dels);
+    }catch(e){ /* transient purge errors are non-fatal */ }
+  },4000);
+}
+
+window.toggleLiveDoubtSorting=type=>{
+  liveDoubtSortCriteria=type;
+  $('ld-sort-latest').classList.toggle('active',type==='latest');
+  $('ld-sort-popular').classList.toggle('active',type==='popular');
+  if(selSessId) bindLiveDoubts(selSessId);
+};
+
+function bindLiveDoubts(sid) {
+  if(doubtUnsub)doubtUnsub();
+  const box=$('live-doubt-box');box.innerHTML='';
+  let q=liveDoubtSortCriteria==='popular'
+    ?query(collection(db,'live_sessions/'+sid+'/doubts'),orderBy('upvotes','desc'))
+    :query(collection(db,'live_sessions/'+sid+'/doubts'),orderBy('timestamp','desc'));
+  doubtUnsub=onSnapshot(q,snap=>{
+    box.innerHTML='';
+    if(snap.empty){box.innerHTML='<div class="empty"><i class="fa-solid fa-circle-question"></i><p>No doubts yet in this session</p></div>';return;}
+    const items=snap.docs.map(ds=>({id:ds.id,...ds.data()}));
+    items.sort((a,b)=>(!!b.urgent)-(!!a.urgent));
+    items.forEach(d=>{
+      const isAns=!!d.answer;
+      box.innerHTML+=`<div class="dc ${isAns?'ans':''} fu" style="${d.urgent?'border-left-color:var(--red);':''}">
+        <div class="dn">${esc(d.studentName)} ${d.urgent?'<span class="bx bx-r" style="font-size:8px;"><i class="fa-solid fa-triangle-exclamation"></i> Urgent</span>':''} <span style="color:var(--dim);font-weight:600;">· ${timeAgo(d.timestamp)}</span></div>
+        <div class="dt">${esc(d.description)}</div>
+        <div style="font-size:10.5px;color:var(--purple);font-weight:700;margin:4px 0;"><i class="fa-solid fa-caret-up"></i> ${d.upvotes||0} upvotes</div>
+        ${isAns?`<div class="da"><div class="da-l">Answer:</div><div class="da-t">${esc(d.answer)}</div></div>`:''}
+        <div class="dc-actions">
+          <button onclick="openAns(${attrStr(d.id)},${attrStr(d.description)},${attrStr(sid)})" class="btn btn-g btn-xs"><i class="fa-solid fa-reply"></i> Answer</button>
+          <button onclick="deleteDoubt('${d.id}','${sid}')" class="btn btn-gh btn-xs" style="color:var(--red);"><i class="fa-solid fa-trash"></i> Delete</button>
+        </div>
+      </div>`;
+    });
+  }, onErr);
+}
+
+window.openAns=(doubtId,text,sid)=>{ansMode='live';ansSid=sid;$('ans-doubt-id').value=doubtId;$('ans-q-text').textContent=text;$('ans-text').value='';$('ans-modal').classList.add('on');};
+window.openAnsGlobal=(doubtId,text)=>{ansMode='global';$('ans-doubt-id').value=doubtId;$('ans-q-text').textContent=text;$('ans-text').value='';$('ans-modal').classList.add('on');};
+window.closeAns=()=>$('ans-modal').classList.remove('on');
+
+window.submitAns=async()=>{
+  const id=$('ans-doubt-id').value,ans=$('ans-text').value.trim();if(!ans)return;
+  await safeWrite(async()=>{
+    if(ansMode==='live'&&ansSid){
+      await updateDoc(doc(db,'live_sessions/'+ansSid+'/doubts',id),{answer:ans,answeredAt:serverTimestamp()});
+    }else if(ansMode==='material'&&ansSid){
+      await updateDoc(doc(db,'materials/'+ansSid+'/doubts',id),{answer:ans,answeredAt:serverTimestamp()});
+    }else{
+      await updateDoc(doc(db,'doubts',id),{answer:ans,answeredAt:serverTimestamp()});
+    }
+    closeAns();
+  });
+};
+
+window.deleteDoubt=async(id,sid)=>{
+  if(!confirm('Delete this doubt?'))return;
+  await safeWrite(async()=>{await deleteDoc(doc(db,'live_sessions/'+sid+'/doubts',id));});
+};
+window.deleteGlobalDoubt=async id=>{
+  if(!confirm('Delete this doubt?'))return;
+  await safeWrite(async()=>{await deleteDoc(doc(db,'doubts',id));});
+};
+
+// ---- Polls: 4 types. MCQ / Multi-Correct / Integer are graded by the admin AFTER the
+// timer ends (so nothing leaks on a shared screen mid-poll). Vote has no correct answer
+// and no leaderboard — it's a straight opinion poll. ----
+let currentPollType='mcq';
+let pollCounter=1;
+const PTYPE_HINTS={
+  mcq:'Students pick one option. Correct answer is revealed after time ends — enter it then.',
+  multi:'Students can pick more than one option. Mark which ones are correct after time ends.',
+  integer:'Students type a numeric answer. Enter the correct number after time ends.',
+  vote:"Plain opinion poll — no correct answer, no leaderboard. Results show live."
+};
+function resetPollForm(){
+  $('pq').value='Poll '+pollCounter;
+  ['A','B','C','D'].forEach((l,i)=>{ $('po'+i).value = currentPollType==='vote' && false ? '' : l; });
+}
+window.setPollType=t=>{
+  currentPollType=t;
+  document.querySelectorAll('.ptype-btn').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
+  $('ptype-hint').textContent=PTYPE_HINTS[t];
+  $('poll-opts-block').classList.toggle('hidden',t==='integer');
+  $('poll-integer-note').classList.toggle('hidden',t!=='integer');
+  resetPollForm();
+};
+resetPollForm();
+
+window.sendPoll=async()=>{
+  if(!selSessId){alert('Select a live session first.');return;}
+  const q=$('pq').value.trim();if(!q)return;
+  const timer=parseInt($('ptimer').value)||30;
+  let opts=[];
+  if(currentPollType!=='integer'){
+    opts=[0,1,2,3].map(i=>$('po'+i).value.trim()).filter(Boolean);
+    if(opts.length<2){alert('Add at least 2 options.');return;}
+  }
+
+  $('send-poll-btn').disabled=true;
+  await safeWrite(async()=>{
+    // auto-close any poll in this session still marked active before sending a new one
+    const existing=await getDocs(collection(db,'live_sessions/'+selSessId+'/polls'));
+    await Promise.all(existing.docs.filter(d=>d.data().active).map(d=>updateDoc(d.ref,{active:false})));
+
+    await addDoc(collection(db,'live_sessions/'+selSessId+'/polls'),{
+      type:currentPollType,question:q,options:opts,duration:timer,
+      createdAt:Date.now(),expiresAt:Date.now()+timer*1000,active:true,
+      graded: currentPollType==='vote' ? true : false,
+      correctOption:null,correctOptions:null,correctAnswer:null,
+      negativeMarking: $('pmarks-toggle').checked,
+      posMarks: parseFloat($('pmarks-pos').value)||0,
+      negMarks: parseFloat($('pmarks-neg').value)||0,
+      leaderboard:[],votesDistribution:{},responses:{},sessionId:selSessId
+    });
+    pollCounter++;
+    resetPollForm();
+  });
+  $('send-poll-btn').disabled=false;
+};
+
+window.endPollNow=async(pollId)=>{
+  await safeWrite(async()=>{await updateDoc(doc(db,'live_sessions/'+selSessId+'/polls',pollId),{active:false,expiresAt:Date.now()});});
+};
+
+// Admin picks the correct answer with a custom in-card UI (no browser prompt()), then presses
+// Submit to grade every stored response and build the speed leaderboard.
+let gradeSelection = {};
+window.selectGradeMcq = (pollId, i) => { gradeSelection[pollId] = i; refreshGradeUI(pollId, 'mcq'); };
+window.selectGradeMulti = (pollId, i) => {
+  const cur = gradeSelection[pollId] || [];
+  const idx = cur.indexOf(i);
+  if (idx >= 0) cur.splice(idx,1); else cur.push(i);
+  gradeSelection[pollId] = cur;
+  refreshGradeUI(pollId, 'multi');
+};
+function refreshGradeUI(pollId, type) {
+  const sel = gradeSelection[pollId];
+  document.querySelectorAll(`[data-grade-opt="${pollId}"]`).forEach(el => {
+    const i = parseInt(el.dataset.i);
+    const on = type === 'multi' ? (sel||[]).includes(i) : sel === i;
+    el.classList.toggle('sel', on);
+  });
+  const btn = document.querySelector(`[data-grade-submit="${pollId}"]`);
+  if (btn) btn.disabled = type === 'multi' ? !(sel && sel.length) : sel === undefined;
+}
+
+window.submitGrade = async (pollId, type) => {
+  let correctOption=null, correctOptions=null, correctAnswer=null;
+  if (type === 'mcq') {
+    if (gradeSelection[pollId] === undefined) return;
+    correctOption = gradeSelection[pollId];
+  } else if (type === 'multi') {
+    if (!gradeSelection[pollId] || !gradeSelection[pollId].length) return;
+    correctOptions = gradeSelection[pollId];
+  } else if (type === 'integer') {
+    const v = document.getElementById('grade-int-'+pollId)?.value.trim();
+    if (!v) return;
+    correctAnswer = v;
+  } else return;
+
+  await safeWrite(async () => {
+    let pollSnapshot;
+    await runTransaction(db, async (tx) => {
+      const ref = doc(db, 'live_sessions/' + selSessId + '/polls', pollId);
+      const snap = await tx.get(ref);
+      if (!snap.exists()) return;
+      const data = snap.data();
+      pollSnapshot = data;
+      const responses = data.responses || {};
+      const createdAt = data.createdAt || 0;
+      const neg = data.negativeMarking;
+      const posM = data.posMarks||1, negM = data.negMarks||0;
+      const lb = [];
+      Object.keys(responses).forEach(uid => {
+        const r = responses[uid];
+        let isCorrect = false;
+        if (type === 'mcq') isCorrect = r.value === correctOption;
+        else if (type === 'multi') isCorrect = Array.isArray(r.value) && r.value.length === correctOptions.length && r.value.slice().sort().every((v,i) => v === correctOptions.slice().sort()[i]);
+        else if (type === 'integer') isCorrect = (r.value+'').trim() === correctAnswer;
+        const score = neg ? (isCorrect ? posM : -negM) : (isCorrect ? 1 : 0);
+        if (isCorrect) lb.push({ studentId: uid, studentName: r.studentName || 'Student', timeToAnswer: Math.max(0, (r.timestamp||createdAt) - createdAt), score });
+      });
+      lb.sort((a,b) => neg ? (b.score - a.score) || (a.timeToAnswer - b.timeToAnswer) : a.timeToAnswer - b.timeToAnswer);
+      tx.update(ref, { graded: true, active: false, correctOption, correctOptions, correctAnswer, leaderboard: lb });
+    });
+    delete gradeSelection[pollId];
+    // Archive a lightweight summary — this survives the chat/poll wipe that happens when the session ends.
+    if (pollSnapshot) {
+      const respCount = Object.keys(pollSnapshot.responses||{}).length;
+      await addDoc(collection(db,'poll_history'), {
+        question: pollSnapshot.question, type, sessionId: selSessId, sessionTitle: selSessData?.title||'',
+        totalResponses: respCount, gradedAt: serverTimestamp(),
+        leaderboardTop3: (pollSnapshot.leaderboard||[]).slice(0,3)
+      });
+    }
+  });
+};
+
+// DOUBTS - GLOBAL (unlinked doubts only — the `classId` field no longer exists in this schema)
+let globalDoubtFilter='all';
+window.toggleGlobalDoubtSorting=type=>{
+  globalDoubtSortCriteria=type;
+  $('gd-sort-latest').classList.toggle('active',type==='latest');
+  $('gd-sort-popular').classList.toggle('active',type==='popular');
+  bindAllDoubts();
+};
+window.toggleGlobalDoubtFilter=f=>{
+  globalDoubtFilter=f;
+  $('gd-filter-all').classList.toggle('active',f==='all');
+  $('gd-filter-unanswered').classList.toggle('active',f==='unanswered');
+  bindAllDoubts();
+};
+
+function bindAllDoubts(){
+  if(globalDoubtsUnsub) globalDoubtsUnsub();
+  const q=globalDoubtSortCriteria==='popular'
+    ?query(collection(db,'doubts'),orderBy('upvotes','desc'))
+    :query(collection(db,'doubts'),orderBy('timestamp','desc'));
+  globalDoubtsUnsub=onSnapshot(q,snap=>{
+    const container=$('all-doubts-list');container.innerHTML='';
+    let docs=snap.docs;
+    if(globalDoubtFilter==='unanswered') docs=docs.filter(ds=>!ds.data().answer);
+    if(!docs.length){container.innerHTML='<div class="empty"><i class="fa-solid fa-circle-question"></i><p>No doubts to show.</p></div>';return;}
+
+    const items=docs.map(ds=>({id:ds.id,...ds.data()}));
+    items.sort((a,b)=>{
+      if(!!a.urgent!==!!b.urgent) return a.urgent?-1:1;
+      const sa=(a.subject||'General'),sb=(b.subject||'General');
+      if(sa!==sb) return sa.localeCompare(sb);
+      const ta=(a.title||''),tb=(b.title||'');
+      if(ta!==tb) return ta.localeCompare(tb);
+      return 0;
+    });
+    let lastSubject=null,lastTitle=null;
+    items.forEach(d=>{
+      const isAns=!!d.answer;
+      const isPrivate=d.visibility==='private';
+      const subject=d.subject||'General';
+      if(subject!==lastSubject){container.innerHTML+=`<div class="subj-divider"><i class="fa-solid fa-layer-group"></i> ${esc(subject)}</div>`;lastSubject=subject;lastTitle=null;}
+      const showTopicTag=d.title&&d.title!==lastTitle;
+      lastTitle=d.title||lastTitle;
+      container.innerHTML+=`<div class="dc ${isAns?'ans':''} fu" style="${d.urgent?'border-left-color:var(--red);':''}">
+        <div class="dn">${esc(d.studentName)} ${d.urgent?'<span class="bx bx-r" style="font-size:8px;"><i class="fa-solid fa-triangle-exclamation"></i> Urgent</span>':''} ${isPrivate?'<span class="bx bx-r" style="font-size:8px;"><i class="fa-solid fa-lock"></i> Teacher Only</span>':''} <span style="color:var(--dim);font-weight:600;font-size:10px;">· ${timeAgo(d.timestamp)}</span></div>
+        ${showTopicTag?`<div style="font-weight:700;font-size:13px;color:var(--text);margin-bottom:4px;">${esc(d.title)}</div>`:''}
+        <div class="dt">${esc(d.description)}</div>
+        <div style="font-size:10.5px;color:var(--purple);font-weight:700;margin:6px 0;"><i class="fa-solid fa-heart"></i> ${d.upvotes||0} upvotes</div>
+        ${isAns?`<div class="da"><div class="da-l">Answer:</div><div class="da-t">${esc(d.answer)}</div></div>`:''}
+        <div class="dc-actions">
+          <button onclick="openAnsGlobal(${attrStr(d.id)},${attrStr(d.description||'')})" class="btn btn-g btn-xs"><i class="fa-solid fa-reply"></i> Answer</button>
+          <button onclick="deleteGlobalDoubt('${d.id}')" class="btn btn-gh btn-xs" style="color:var(--red);"><i class="fa-solid fa-trash"></i> Delete</button>
+        </div>
+      </div>`;
+    });
+  }, onErr);
+}
+
+let totalStudentsCount = 0;
+function bindStudents(){
+  onSnapshot(query(collection(db,'users'),where('role','==','student')),snap=>{
+    $('stat-s').textContent=snap.size;
+    totalStudentsCount = snap.size;
+    const tb=$('student-tbody');tb.innerHTML='';
+    snap.forEach(ds=>{
+      const d=ds.data();
+      tb.innerHTML+=`<tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:12px 16px;"><span style="font-size:13px;font-weight:600;">${esc(d.displayName||'Student')}</span></td>
+        <td style="padding:12px 16px;font-size:12px;color:var(--dim);">${esc(d.email)}</td>
+        <td style="padding:12px 16px;text-align:right;">
+          <button onclick="viewStudentStats(${attrStr(ds.id)},${attrStr(d.displayName||'Student')})" class="btn btn-gh btn-xs" style="margin-right:6px;"><i class="fa-solid fa-chart-simple"></i> Stats</button>
+          <button onclick="revokeStudent('${ds.id}')" class="btn btn-gh btn-xs" style="color:var(--red);">Revoke Access</button>
+        </td>
+      </tr>`;
+    });
+  }, onErr);
+}
+// Real revocation: deletes the Firebase Auth account itself (via our Admin-SDK-backed
+// API) so the student genuinely can't sign back in — not just their Firestore profile.
+window.revokeStudent=async id=>{
+  if(!confirm('Revoke access for this student? This permanently deletes their account and they will not be able to sign in again.')) return;
+  setSync('busy');
+  try{
+    const token=await getAdminIdToken();
+    const r=await fetch('/api/admin/delete-user',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({uid:id})});
+    const data=await r.json();
+    if(!r.ok) throw new Error(data.error||'Failed to revoke access');
+    setSync('ok');toast('Access revoked.');
+  }catch(err){console.error(err);setSync('err','revoke failed');toast('Action failed: '+(err.message||err));}
+};
+
+// ---- Admins page: list all Auth accounts, promote/demote, delete, export ----
+window.refreshUserList=async()=>{
+  const tb=$('admin-users-tbody');
+  try{
+    const token=await getAdminIdToken();
+    const r=await fetch('/api/admin/list-users',{headers:{Authorization:'Bearer '+token}});
+    const data=await r.json();
+    if(!r.ok) throw new Error(data.error||'Failed to load users');
+    tb.innerHTML='';
+    data.users.forEach(u=>{
+      const last=u.lastSignIn?new Date(u.lastSignIn).toLocaleDateString():'Never';
+      tb.innerHTML+=`<tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:12px 16px;">
+          <div style="font-size:13px;font-weight:600;">${esc(u.displayName||u.email||u.uid)}</div>
+          <div style="font-size:11px;color:var(--dim);">${esc(u.email)}</div>
+        </td>
+        <td style="padding:12px 16px;">${u.admin?'<span class="bx bx-p">Admin</span>':'<span class="bx bx-b">Student</span>'}</td>
+        <td style="padding:12px 16px;font-size:12px;color:var(--dim);">${esc(last)}</td>
+        <td style="padding:12px 16px;text-align:right;white-space:nowrap;">
+          ${u.admin
+            ?`<button onclick="setUserRole(${attrStr(u.uid)},'student')" class="btn btn-gh btn-xs" style="margin-right:6px;">Demote</button>`
+            :`<button onclick="setUserRole(${attrStr(u.uid)},'admin')" class="btn btn-gh btn-xs" style="margin-right:6px;">Promote</button>`}
+          <button onclick="deleteUserAccount(${attrStr(u.uid)})" class="btn btn-gh btn-xs" style="color:var(--red);">Delete</button>
+        </td>
+      </tr>`;
+    });
+    if(!data.users.length) tb.innerHTML='<tr><td colspan="4" style="padding:20px;text-align:center;color:var(--dim);font-size:12px;">No users yet.</td></tr>';
+  }catch(err){console.error(err);tb.innerHTML=`<tr><td colspan="4" style="padding:20px;text-align:center;color:var(--red);font-size:12px;">${esc(err.message||'Failed to load users')}</td></tr>`;}
+};
+window.promoteByEmail=async()=>{
+  const email=$('promote-email').value.trim();
+  if(!email){toast('Enter an email first.');return;}
+  try{
+    const token=await getAdminIdToken();
+    const lr=await fetch('/api/admin/list-users',{headers:{Authorization:'Bearer '+token}});
+    const ldata=await lr.json();
+    if(!lr.ok) throw new Error(ldata.error||'Lookup failed');
+    const match=(ldata.users||[]).find(u=>(u.email||'').toLowerCase()===email.toLowerCase());
+    if(!match){toast('No account with that email. They must sign up first.');return;}
+    await setUserRole(match.uid,'admin');
+    $('promote-email').value='';
+  }catch(err){console.error(err);toast('Action failed: '+(err.message||err));}
+};
+window.setUserRole=async(uid,role)=>{
+  setSync('busy');
+  try{
+    const token=await getAdminIdToken();
+    const r=await fetch('/api/admin/set-role',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({uid,role})});
+    const data=await r.json();
+    if(!r.ok) throw new Error(data.error||'Failed to update role');
+    setSync('ok');toast(role==='admin'?'Promoted to admin.':'Demoted to student.');
+    refreshUserList();
+  }catch(err){console.error(err);setSync('err','update failed');toast('Action failed: '+(err.message||err));}
+};
+window.deleteUserAccount=async uid=>{
+  if(!confirm('Permanently delete this account? This cannot be undone.')) return;
+  setSync('busy');
+  try{
+    const token=await getAdminIdToken();
+    const r=await fetch('/api/admin/delete-user',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({uid})});
+    const data=await r.json();
+    if(!r.ok) throw new Error(data.error||'Failed to delete user');
+    setSync('ok');toast('Account deleted.');
+    refreshUserList();
+  }catch(err){console.error(err);setSync('err','delete failed');toast('Action failed: '+(err.message||err));}
+};
+window.exportStudentsCsv=async()=>{
+  try{
+    const token=await getAdminIdToken();
+    const r=await fetch('/api/admin/export-students',{headers:{Authorization:'Bearer '+token}});
+    if(!r.ok){const d=await r.json().catch(()=>({}));throw new Error(d.error||'Export failed');}
+    const blob=await r.blob();
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download='astrocore-students.csv';document.body.appendChild(a);a.click();a.remove();
+    URL.revokeObjectURL(url);
+  }catch(err){console.error(err);toast('Export failed: '+(err.message||err));}
+};
+
+window.closeStudentStats=()=>$('stats-modal').classList.remove('on');
+window.viewStudentStats=async(uid,name)=>{
+  $('stats-title').textContent='Stats — '+name;
+  $('stats-body').innerHTML='<p style="font-size:12px;color:var(--dim);text-align:center;padding:20px;">Loading…</p>';
+  $('stats-modal').classList.add('on');
+  try{
+    const doubtsSnap=await getDocs(query(collection(db,'doubts'),where('studentId','==',uid)));
+    const urgentCount=doubtsSnap.docs.filter(d=>d.data().urgent).length;
+    const answeredCount=doubtsSnap.docs.filter(d=>d.data().answer).length;
+    const histSnap=await getDocs(collection(db,'poll_history'));
+    let podiumFinishes=0;
+    histSnap.forEach(ds=>{ (ds.data().leaderboardTop3||[]).forEach(e=>{ if(e.studentId===uid) podiumFinishes++; }); });
+    $('stats-body').innerHTML=`
+      <div class="stat-grid" style="grid-template-columns:1fr 1fr;">
+        <div class="stat-card"><div class="lbl" style="color:var(--purple);">Doubts Asked</div><div class="val" style="font-size:2rem;">${doubtsSnap.size}</div></div>
+        <div class="stat-card"><div class="lbl" style="color:var(--green);">Answered</div><div class="val" style="font-size:2rem;">${answeredCount}</div></div>
+        <div class="stat-card"><div class="lbl" style="color:var(--red);">Urgent Flags</div><div class="val" style="font-size:2rem;">${urgentCount}</div></div>
+        <div class="stat-card"><div class="lbl" style="color:var(--amber);">Poll Podiums</div><div class="val" style="font-size:2rem;">${podiumFinishes}</div></div>
+      </div>
+      <p style="font-size:10.5px;color:var(--dim);margin-top:6px;">Poll podiums = top-3 finishes in graded polls (full poll data is wiped when a session ends, only the top-3 archive survives).</p>`;
+  }catch(err){ $('stats-body').innerHTML='<p style="font-size:12px;color:var(--red);text-align:center;padding:20px;">Could not load stats.</p>'; onErr(err); }
+};
+
+function bindStats(){
+  onSnapshot(collection(db,'materials'),snap=>$('stat-c').textContent=snap.size, onErr);
+  onSnapshot(collection(db,'doubts'),snap=>$('stat-d').textContent=snap.size, onErr);
+}
+
+window.setCTab=t=>{
+  ['chat','doubts','polls','tools'].forEach(x=>{$('cv-'+x).classList.remove('on');$('ct-'+x).classList.remove('on');});
+  $('cv-'+t).classList.add('on');$('ct-'+t).classList.add('on');
+};
+
+window.saveProfile=async()=>{
+  const name=$('prof-name-inp').value,pic=$('prof-av-inp').value;
+  await safeWrite(async()=>{
+    await updateProfile(auth.currentUser,{displayName:name,photoURL:pic||null});
+    $('prof-name-d').textContent=name;
+  });
+};
+
+window.savePollTemplate=async()=>{
+  const q=$('pq').value.trim();if(!q)return;
+  const opts=currentPollType!=='integer'?[0,1,2,3].map(i=>$('po'+i).value.trim()).filter(Boolean):[];
+  await safeWrite(async()=>{
+    await addDoc(collection(db,'poll_templates'),{type:currentPollType,question:q,options:opts,duration:parseInt($('ptimer').value)||30,createdAt:serverTimestamp()});
+  });
+  toast('Template saved');
+};
+window.loadPollTemplate=(id)=>{
+  const t=pollTemplatesCache.find(x=>x.id===id);if(!t)return;
+  setPollType(t.type);
+  $('pq').value=t.question;
+  (t.options||[]).forEach((o,i)=>{ if($('po'+i)) $('po'+i).value=o; });
+  $('ptimer').value=t.duration||30;
+};
+window.deletePollTemplate=async(id)=>{
+  await safeWrite(async()=>{ await deleteDoc(doc(db,'poll_templates',id)); });
+};
+let pollTemplatesCache=[];
+function bindPollTemplates(){
+  onSnapshot(collection(db,'poll_templates'),snap=>{
+    pollTemplatesCache=[];snap.forEach(ds=>pollTemplatesCache.push({id:ds.id,...ds.data()}));
+    const row=$('poll-templates-row');
+    row.innerHTML = pollTemplatesCache.length
+      ? pollTemplatesCache.map(t=>`<span class="bx bx-p fu" style="cursor:pointer;padding:4px 9px;" onclick="loadPollTemplate('${t.id}')">${esc(t.question.slice(0,22))}${t.question.length>22?'…':''} <i class="fa-solid fa-xmark" style="margin-left:4px;opacity:0.6;" onclick="event.stopPropagation();deletePollTemplate('${t.id}')"></i></span>`).join('')
+      : '';
+  }, onErr);
+}
+
+// live poll list render lives in bindLivePolls, defined last so it can use endPollNow/esc/timeAgo above
+function bindLivePolls(sid){
+  if(pollsUnsub)pollsUnsub();
+  const list=$('live-polls-list');
+  pollsUnsub=onSnapshot(collection(db,'live_sessions/'+sid+'/polls'),snap=>{
+    list.innerHTML='';
+    if(snap.empty){list.innerHTML='<p style="font-size:12px;color:var(--dim);text-align:center;padding:20px;">No polls sent yet.</p>';return;}
+    let docsArr=[];snap.forEach(ds=>docsArr.push({id:ds.id,...ds.data()}));
+    docsArr.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    docsArr.forEach(d=>{
+      const type=d.type||'mcq';
+      const responses=d.responses||{};
+      const respCount=Object.keys(responses).length;
+      const isLive=d.active&&d.expiresAt&&Date.now()<d.expiresAt;
+      const needsGrading=!isLive&&type!=='vote'&&!d.graded;
+      const lb=(d.leaderboard||[]).slice().sort((a,b)=>a.timeToAnswer-b.timeToAnswer);
+
+      let bodyHTML='';
+      if(type==='integer'){
+        bodyHTML=`<p style="font-size:11.5px;color:var(--dim);padding:4px 2px;">${respCount} numeric responses submitted.</p>`;
+      }else{
+        const distribution=d.votesDistribution||{};
+        const total=Object.values(distribution).reduce((a,c)=>a+(c||0),0);
+        (d.options||[]).forEach((o,i)=>{
+          const c=distribution[i]||0;
+          const pct=total?Math.round((c/total)*100):0;
+          const isCorrectMcq=d.graded&&type==='mcq'&&i===d.correctOption;
+          const isCorrectMulti=d.graded&&type==='multi'&&(d.correctOptions||[]).includes(i);
+          bodyHTML+=`<div class="pc-opt-wrapper">
+            <div class="pc-opt-fill ${(isCorrectMcq||isCorrectMulti)?'correct-fill':''}" style="width:${pct}%;"></div>
+            <div class="pc-opt-content"><span style="color:var(--purple);font-weight:800;">${['A','B','C','D'][i]}.</span> ${esc(o)} <span style="margin-left:auto;color:var(--dim);font-size:11px;">${pct}% (${c})</span></div>
+          </div>`;
+        });
+      }
+
+      let gradeHTML='';
+      if(needsGrading){
+        if(type==='mcq'||type==='multi'){
+          const optsRow=(d.options||[]).map((o,i)=>`<button type="button" data-grade-opt="${d.id}" data-i="${i}" class="grade-opt-btn" onclick="${type==='mcq'?`selectGradeMcq('${d.id}',${i})`:`selectGradeMulti('${d.id}',${i})`}">${['A','B','C','D'][i]}</button>`).join('');
+          gradeHTML=`<div style="padding:10px 14px;background:rgba(245,158,11,0.06);border-top:1px solid rgba(245,158,11,0.15);">
+            <p style="font-size:10.5px;font-weight:700;color:var(--amber);text-transform:uppercase;margin-bottom:7px;">Tap the correct option${type==='multi'?'s':''}</p>
+            <div style="display:flex;gap:6px;margin-bottom:8px;">${optsRow}</div>
+            <button data-grade-submit="${d.id}" onclick="submitGrade('${d.id}','${type}')" class="btn btn-p btn-xs" style="width:100%;justify-content:center;" disabled><i class="fa-solid fa-check"></i> Submit & Reveal Leaderboard</button>
+          </div>`;
+        } else if(type==='integer'){
+          gradeHTML=`<div style="padding:10px 14px;background:rgba(245,158,11,0.06);border-top:1px solid rgba(245,158,11,0.15);">
+            <p style="font-size:10.5px;font-weight:700;color:var(--amber);text-transform:uppercase;margin-bottom:7px;">Enter the correct number</p>
+            <div style="display:flex;gap:6px;">
+              <input type="number" id="grade-int-${d.id}" placeholder="Correct answer" style="flex:1;">
+              <button data-grade-submit="${d.id}" onclick="submitGrade('${d.id}','integer')" class="btn btn-p btn-xs">Submit</button>
+            </div>
+          </div>`;
+        }
+      }
+
+      let lbHTML='';
+      if(d.graded&&type!=='vote'){
+        const rows=lb.length?lb.map((entry,idx)=>`<div class="pc-lb-row fu"><span style="font-weight:800;color:var(--purple);">#${idx+1}</span><span style="flex:1;font-weight:600;margin-left:4px;">${esc(entry.studentName)}</span>${d.negativeMarking?`<span style="color:var(--purple);font-weight:800;margin-right:8px;">${entry.score>0?'+':''}${entry.score}</span>`:''}<span style="color:var(--green);font-weight:700;"><i class="fa-solid fa-stopwatch" style="font-size:10px;margin-right:2px;"></i>${(entry.timeToAnswer/1000).toFixed(2)}s</span></div>`).join(''):'<p style="font-size:11px;color:var(--dim);margin-left:10px;font-style:italic;">No one answered correctly.</p>';
+        lbHTML=`<div style="padding:0 14px 10px;">
+          <p style="font-size:9px;font-weight:800;color:var(--dim);text-transform:uppercase;margin:0 0 6px 0;letter-spacing:0.05em;"><i class="fa-solid fa-trophy" style="color:var(--amber);"></i> Live Leaderboard</p>
+          ${rows}
+        </div>`;
+      }
+
+      list.innerHTML+=`<div class="pc fu">
+        <div class="pc-head">
+          <div class="pc-q"><span class="bx bx-p" style="margin-right:6px;">${TYPE_LABEL[type]}</span>${d.negativeMarking?`<span class="bx bx-r" style="margin-right:6px;">+${d.posMarks}/-${d.negMarks}</span>`:''}${esc(d.question)}</div>
+          <div style="font-size:10px;color:var(--dim);display:flex;align-items:center;gap:8px;">
+            <span>${respCount}${totalStudentsCount?'/'+totalStudentsCount:''} responded · ${isLive?'<span style="color:var(--red);font-weight:700;">Live</span>':(d.graded||type==='vote'?'Closed':'Awaiting grading')}</span>
+            ${isLive?`<button onclick="endPollNow('${d.id}')" class="btn btn-gh btn-xs" style="color:var(--red);padding:2px 8px;">End Now</button>`:''}
+          </div>
+        </div>
+        <div class="pc-body">${bodyHTML}</div>
+        ${gradeHTML}
+        ${lbHTML}
+      </div>`;
+    });
+    docsArr.forEach(d=>{ if(gradeSelection[d.id]!==undefined) refreshGradeUI(d.id, d.type||'mcq'); });
+  }, onErr);
+}
+</script>
+</body>
+</html>

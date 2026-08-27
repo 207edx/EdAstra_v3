@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AstroCore — Student Portal</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg-a:#fce4d6;--bg-b:#e8d5f5;--bg-c:#d5e8f5;--bg-d:#d5f5e8;
+  --surface:rgba(255,255,255,0.55);--surface2:rgba(255,255,255,0.75);
+  --surface3:rgba(255,255,255,0.65);
+  --text:#1a1035;--dim:#7a6e8a;--border:rgba(255,255,255,0.7);--border2:rgba(0,0,0,0.07);
+  --orange:#f97316;--purple:#9333ea;--blue:#3b82f6;--green:#10b981;
+  --red:#ef4444;--amber:#f59e0b;
+  --ff-display:'DM Serif Display',serif;
+  --ff-body:'Plus Jakarta Sans',sans-serif;
+  --ff-ui:'Syne',sans-serif;
+  --dock-h:74px;
+}
+html,body{height:100%;overflow:hidden;font-family:var(--ff-body);color:var(--text);}
+body{background:linear-gradient(135deg,var(--bg-a) 0%,var(--bg-b) 40%,var(--bg-c) 70%,var(--bg-d) 100%);}
+.hidden{display:none!important;}
+.blob{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0;}
+.blob-1{width:500px;height:500px;background:rgba(249,115,22,0.22);top:-120px;left:-100px;}
+.blob-2{width:400px;height:400px;background:rgba(147,51,234,0.18);bottom:-80px;right:20%;animation:drift 8s ease-in-out infinite;}
+.blob-3{width:300px;height:300px;background:rgba(59,130,246,0.18);top:30%;right:-80px;animation:drift 6s ease-in-out infinite reverse;}
+@keyframes drift{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(147,51,234,0.2);border-radius:10px;}
+.glass{background:var(--surface);border:1px solid var(--border);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);box-shadow:0 8px 32px rgba(0,0,0,0.05),inset 0 1px 0 rgba(255,255,255,0.9);}
+.glass2{background:var(--surface2);border:1px solid var(--border);backdrop-filter:blur(28px);}
+#auth-section{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(252,228,214,0.92),rgba(232,213,245,0.92));backdrop-filter:blur(24px);}
+.auth-card{background:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.9);backdrop-filter:blur(40px);border-radius:28px;padding:40px 36px;width:420px;max-width:92vw;box-shadow:0 20px 60px rgba(147,51,234,0.08),inset 0 1px 0 rgba(255,255,255,1);}
+.auth-logo{width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,var(--purple),var(--orange));display:flex;align-items:center;justify-content:center;margin:0 auto 14px;box-shadow:0 8px 20px rgba(147,51,234,0.25);}
+.auth-logo i{color:white;font-size:22px;}
+.auth-brand{font-family:var(--ff-ui);font-size:1.4rem;font-weight:800;text-align:center;color:var(--text);}
+.auth-brand span{color:var(--purple);}
+.auth-sub{font-size:0.7rem;color:var(--dim);text-align:center;margin-top:4px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;}
+.inp{background:rgba(255,255,255,0.8);border:1px solid rgba(147,51,234,0.15);color:var(--text);border-radius:12px;padding:11px 16px;width:100%;outline:none;font-size:13.5px;font-family:var(--ff-body);transition:all 0.2s;}
+.inp:focus{border-color:var(--purple);background:#fff;box-shadow:0 0 0 3px rgba(147,51,234,0.1);}
+select.inp option{background:#fff;color:var(--text);}
+textarea.inp{resize:none;}
+.btn{padding:10px 20px;border-radius:12px;font-weight:700;font-size:13px;cursor:pointer;transition:all 0.2s;border:none;display:inline-flex;align-items:center;gap:8px;font-family:var(--ff-body);}
+.btn:disabled{opacity:0.5;cursor:not-allowed;}
+.btn-purple{background:linear-gradient(135deg,var(--purple),#7c3aed);color:white;box-shadow:0 4px 14px rgba(147,51,234,0.25);}
+.btn-purple:hover{box-shadow:0 6px 20px rgba(147,51,234,0.35);transform:translateY(-1px);}
+.btn-ghost{background:rgba(255,255,255,0.6);color:var(--text);border:1px solid var(--border2);}
+.btn-ghost:hover{background:rgba(255,255,255,0.9);}
+.btn-red{background:linear-gradient(135deg,var(--red),#dc2626);color:white;}
+.btn-sm{padding:6px 14px;font-size:11.5px;border-radius:9px;}
+.btn-xs{padding:4px 10px;font-size:10.5px;border-radius:7px;}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;}
+.badge-red{background:rgba(239,68,68,0.1);color:var(--red);border:1px solid rgba(239,68,68,0.2);}
+.badge-purple{background:rgba(147,51,234,0.1);color:var(--purple);border:1px solid rgba(147,51,234,0.2);}
+.badge-green{background:rgba(16,185,129,0.1);color:var(--green);border:1px solid rgba(16,185,129,0.2);}
+.badge-yellow{background:rgba(245,158,11,0.1);color:var(--amber);border:1px solid rgba(245,158,11,0.2);}
+@keyframes lp{0%,100%{opacity:1}50%{opacity:0.4}}
+.lpulse{animation:lp 1.2s ease infinite;}
+@keyframes fu{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fu 0.22s ease forwards;}
+#topbar{height:56px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:rgba(255,255,255,0.45);border-bottom:1px solid var(--border);backdrop-filter:blur(28px);position:relative;z-index:30;}
+.brand{font-family:var(--ff-ui);font-size:1.1rem;font-weight:800;color:var(--text);}
+.brand span{color:var(--purple);}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+#conn-badge{display:flex;align-items:center;gap:6px;padding:4px 11px;border-radius:20px;font-size:10.5px;font-weight:700;color:var(--green);background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.15);}
+#conn-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);}
+#conn-badge.err{color:var(--red);background:rgba(239,68,68,0.06);border-color:rgba(239,68,68,0.15);}
+#conn-badge.err #conn-dot{background:var(--red);box-shadow:0 0 6px var(--red);}
+.user-pill{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.7);border:1px solid var(--border);padding:5px 12px 5px 5px;border-radius:99px;}
+.user-pill img{width:26px;height:26px;border-radius:50%;object-fit:cover;border:1.5px solid var(--border);}
+.user-pill span{font-size:12px;font-weight:700;color:var(--text);}
+#dock-wrap{position:fixed;bottom:12px;left:0;right:0;height:var(--dock-h);display:flex;align-items:center;justify-content:center;z-index:90;}
+.dock{display:flex;align-items:flex-end;gap:8px;padding:10px 20px;background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.8);border-radius:28px;backdrop-filter:blur(30px);box-shadow:0 12px 40px rgba(0,0,0,0.06),inset 0 1px 0 rgba(255,255,255,0.9);}
+.dock-btn{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1);position:relative;}
+.dock-btn:hover{transform:translateY(-10px) scale(1.12);}
+.dock-btn .icon{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:17px;transition:all 0.25s;color:var(--dim);background:rgba(255,255,255,0.4);}
+.dock-btn .label{font-family:var(--ff-ui);font-size:7.5px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:0.06em;transition:color .2s;}
+.dock-btn:hover .label{color:var(--text);}
+.dock-btn.on .icon{background:white;color:var(--purple);box-shadow:0 4px 16px rgba(147,51,234,0.2);}
+.dock-btn.on .label{color:var(--purple);}
+.dock-btn::after{content:'';position:absolute;bottom:-6px;width:4px;height:4px;border-radius:50%;background:var(--purple);opacity:0;transition:opacity .2s;}
+.dock-btn.on::after{opacity:1;}
+.folder-pill{padding:6px 16px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;background:rgba(255,255,255,0.5);color:var(--dim);border:1px solid var(--border);transition:all 0.2s;white-space:nowrap;font-family:var(--ff-body);}
+.folder-pill.active{background:white;color:var(--purple);border-color:rgba(147,51,234,0.3);box-shadow:0 4px 12px rgba(147,51,234,0.1);}
+.folder-pill:hover:not(.active){background:rgba(255,255,255,0.8);color:var(--text);}
+.sort-bar{display:flex;gap:4px;background:rgba(255,255,255,0.4);border:1px solid var(--border);padding:4px;border-radius:10px;margin-bottom:14px;}
+.sort-pill{padding:5px 14px;font-size:11px;font-weight:700;color:var(--dim);border-radius:7px;background:transparent;cursor:pointer;border:none;font-family:var(--ff-body);transition:all 0.2s;}
+.sort-pill.active{background:white;color:var(--purple);box-shadow:0 2px 8px rgba(0,0,0,0.05);}
+.main-page{display:none;height:calc(100vh - 56px - var(--dock-h) - 16px);overflow-y:auto;padding-bottom:30px;position:relative;z-index:1;}
+.main-page.active{display:block;}
+.vid-card{border-radius:14px;overflow:hidden;cursor:pointer;background:var(--surface3);border:1px solid var(--border);box-shadow:0 4px 12px rgba(0,0,0,0.03);transition:all 0.22s;}
+.vid-card:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(147,51,234,0.1);border-color:rgba(147,51,234,0.25);}
+.vid-thumb{position:relative;padding-bottom:54%;background:linear-gradient(135deg,rgba(249,115,22,0.08),rgba(147,51,234,0.08));overflow:hidden;}
+.vid-thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.vid-card-body{padding:10px 12px;background:rgba(255,255,255,0.45);}
+.pdf-card{border-radius:12px;padding:12px;background:var(--surface3);border:1px solid var(--border);box-shadow:0 4px 12px rgba(0,0,0,0.03);transition:all 0.22s;cursor:pointer;}
+.pdf-card:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(147,51,234,0.08);border-color:rgba(147,51,234,0.2);}
+.ptab{flex:1;padding:11px 0;text-align:center;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;cursor:pointer;color:var(--dim);border-bottom:2px solid transparent;background:transparent;border-top:none;border-left:none;border-right:none;font-family:var(--ff-ui);transition:all 0.2s;}
+.ptab.active{color:var(--purple);border-bottom-color:var(--purple);}
+.chat-bubble{border-radius:14px;margin-bottom:7px;padding:10px 12px;font-size:12.5px;}
+.chat-mine{background:rgba(147,51,234,0.08);border:1px solid rgba(147,51,234,0.12);margin-left:auto;max-width:85%;}
+.chat-theirs{background:rgba(255,255,255,0.7);border:1px solid var(--border);margin-right:auto;max-width:85%;}
+.dc{border-radius:14px;padding:14px;border:1px solid var(--border);background:rgba(255,255,255,0.6);border-left:4px solid #c4b5fd;margin-bottom:10px;backdrop-filter:blur(20px);box-shadow:0 4px 14px rgba(147,51,234,0.05);transition:box-shadow .2s,transform .2s;}
+.dc:hover{box-shadow:0 8px 22px rgba(147,51,234,0.09);transform:translateY(-1px);}
+.dc.ans{border-left-color:var(--green);background:rgba(255,255,255,0.65);}
+.dc.urgent{border-left-color:var(--red);}
+.dc-avatar{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--orange));color:#fff;font-size:9.5px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+.poll-overlay{position:absolute;inset:0;z-index:60;backdrop-filter:blur(14px);background:rgba(252,228,214,0.94);display:flex;flex-direction:column;}
+.pc-opt-wrapper{margin-bottom:8px;position:relative;border-radius:10px;overflow:hidden;border:1px solid var(--border2);background:rgba(255,255,255,0.5);cursor:pointer;transition:all .15s;}
+.pc-opt-wrapper:hover{border-color:rgba(147,51,234,0.35);}
+.pc-opt-wrapper.locked{cursor:default;}
+.pc-opt-fill{position:absolute;top:0;left:0;bottom:0;background:rgba(147,51,234,0.12);transition:width 0.4s cubic-bezier(0.4,0,0.2,1);z-index:0;}
+.pc-opt-fill.correct-fill{background:rgba(16,185,129,0.16);}
+.pc-opt-fill.wrong-fill{background:rgba(239,68,68,0.12);}
+.pc-opt-content{position:relative;z-index:1;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;font-size:12.5px;}
+#toast-wrap{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);z-index:500;display:flex;flex-direction:column;gap:8px;align-items:center;}
+.toast{background:rgba(26,16,53,0.92);color:#fff;padding:9px 18px;border-radius:12px;font-size:12.5px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,0.25);}
+.vis-btn{padding:4px 11px;border-radius:8px;font-size:10.5px;font-weight:700;border:1px solid var(--border2);background:rgba(255,255,255,0.6);color:var(--dim);cursor:pointer;font-family:var(--ff-body);transition:all .15s;}
+.vis-btn.active{background:var(--purple);color:#fff;border-color:var(--purple);}
+.content-switch-btn{padding:6px 13px;border-radius:9px;font-size:11.5px;font-weight:700;border:1px solid var(--border2);background:rgba(255,255,255,0.6);color:var(--dim);cursor:pointer;font-family:var(--ff-body);transition:all .15s;display:inline-flex;align-items:center;gap:6px;}
+.content-switch-btn.active{background:var(--purple);color:#fff;border-color:var(--purple);}
+.content-switch-btn:hover:not(.active){background:rgba(255,255,255,0.9);color:var(--text);}
+.watch-check{position:absolute;top:8px;right:8px;z-index:2;width:22px;height:22px;border-radius:7px;background:rgba(255,255,255,0.85);border:1.5px solid rgba(255,255,255,0.9);display:flex;align-items:center;justify-content:center;cursor:pointer;color:transparent;transition:all .15s;backdrop-filter:blur(6px);}
+.watch-check:hover{border-color:var(--purple);}
+.watch-check.done{background:var(--green);border-color:var(--green);color:#fff;}
+.subj-divider{font-family:var(--ff-ui);font-size:0.62rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--purple);margin:16px 0 8px;padding-bottom:6px;border-bottom:1px solid rgba(147,51,234,0.15);}
+.subj-divider:first-child{margin-top:0;}
+.topic-tag{font-size:9.5px;font-weight:700;color:var(--dim);background:rgba(0,0,0,0.03);padding:2px 8px;border-radius:6px;display:inline-block;margin-bottom:4px;}
+body.dark{--bg-a:#1a1035;--bg-b:#241640;--bg-c:#1c2440;--bg-d:#16241f;--surface:rgba(30,22,50,0.6);--surface2:rgba(30,22,50,0.8);--surface3:rgba(30,22,50,0.55);--text:#f1edf9;--dim:#a599c2;--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.08);}
+body.dark input,body.dark textarea,body.dark select{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.1);color:var(--text);}
+body.dark .chat-theirs,body.dark .dc,body.dark .vid-card-body,body.dark .pdf-card{background:rgba(255,255,255,0.04);}
+body.dark .auth-card{background:rgba(30,22,50,0.9);}
+</style>
+</head>
+<body>
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+<div id="toast-wrap"></div>
+
+<!-- AUTH -->
+<div id="auth-section">
+  <div class="auth-card fu">
+    <div class="auth-logo"><i class="fa-solid fa-rocket"></i></div>
+    <div class="auth-brand">ASTRO<span>CORE</span></div>
+    <p id="auth-subtitle" class="auth-sub">Student Portal</p>
+    <form id="auth-form" style="margin-top:24px;display:flex;flex-direction:column;gap:12px;">
+      <input type="email" id="auth-email" required class="inp" placeholder="Email address">
+      <input type="password" id="auth-pass" required class="inp" placeholder="Password">
+      <button type="submit" id="auth-btn" class="btn btn-purple" style="width:100%;justify-content:center;padding:12px 20px;"><i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In</button>
+      <p id="auth-error" class="hidden" style="font-size:12px;color:var(--red);text-align:center;background:rgba(239,68,68,0.06);padding:8px;border-radius:8px;border:1px solid rgba(239,68,68,0.15);"></p>
+      <p id="auth-reset-msg" class="hidden" style="font-size:12px;color:var(--green);text-align:center;background:rgba(16,185,129,0.06);padding:8px;border-radius:8px;border:1px solid rgba(16,185,129,0.15);"></p>
+      <div style="display:flex;justify-content:space-between;">
+        <button type="button" id="forgot-pass-btn" style="background:none;border:none;font-size:12px;color:var(--dim);font-weight:600;cursor:pointer;font-family:var(--ff-body);">Forgot password?</button>
+        <button type="button" id="toggle-auth-btn" style="background:none;border:none;font-size:12.5px;color:var(--purple);font-weight:700;cursor:pointer;font-family:var(--ff-body);">Create an account</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard-view" class="hidden" style="height:100vh;display:flex;flex-direction:column;">
+  <div id="topbar">
+    <div class="brand">ASTRO<span>CORE</span></div>
+    <div class="topbar-right">
+      <div id="conn-badge"><div id="conn-dot"></div><span id="conn-txt">Live</span></div>
+      <button onclick="toggleTheme()" class="btn btn-ghost btn-sm" id="theme-toggle-btn" style="padding:6px 10px;"><i class="fa-solid fa-moon"></i></button>
+      <div class="user-pill">
+        <img id="header-avatar" src="" alt="">
+        <span id="header-user-name">Student</span>
+      </div>
+      <button id="logout-btn" class="btn btn-ghost btn-sm" style="color:var(--red);padding:6px 10px;"><i class="fa-solid fa-power-off"></i></button>
+    </div>
+  </div>
+
+  <div style="flex:1;overflow:hidden;position:relative;">
+
+    <div id="page-live" class="main-page p-6" style="max-width:1200px;margin:0 auto;">
+      <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;">
+        <button class="folder-pill active" id="subtab-live-now" onclick="switchLiveSubTab('now')"><span class="lpulse" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--red);margin-right:6px;"></span>Live Now</button>
+        <button class="folder-pill" id="subtab-live-ended" onclick="switchLiveSubTab('ended')">Ended Sessions</button>
+      </div>
+      <div id="live-grid-now" class="grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;"></div>
+      <div id="live-grid-ended" class="hidden grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;"></div>
+    </div>
+
+    <div id="page-recorded" class="main-page p-6" style="max-width:1200px;margin:0 auto;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px;">
+        <button class="folder-pill active" id="rf-all" onclick="filterRecorded('all')">All Lectures</button>
+        <div id="recorded-folder-tabs" style="display:flex;gap:6px;"></div>
+      </div>
+      <div id="recorded-grid" class="grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;"></div>
+      <div id="recorded-empty" class="hidden" style="text-align:center;padding:60px 20px;color:var(--dim);font-size:13px;">No recorded lectures here yet.</div>
+    </div>
+
+    <div id="page-pdfs" class="main-page p-6" style="max-width:1200px;margin:0 auto;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px;">
+        <button class="folder-pill active" id="pf-all" onclick="filterPDFs('all')">All Notes</button>
+        <div id="pdf-folder-tabs" style="display:flex;gap:6px;"></div>
+      </div>
+      <div id="pdf-grid" class="grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;"></div>
+      <div id="pdf-empty" class="hidden" style="text-align:center;padding:60px 20px;color:var(--dim);font-size:13px;">No PDFs available yet.</div>
+    </div>
+
+    <div id="page-my-doubts" class="main-page p-6" style="max-width:800px;margin:0 auto;">
+      <div class="glass" style="border-radius:20px;padding:20px;margin-bottom:18px;">
+        <div style="font-family:var(--ff-ui);font-size:0.62rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--purple);margin-bottom:14px;"><i class="fa-solid fa-plus-circle"></i> Ask a General Doubt</div>
+        <form id="global-doubt-form" style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <select id="gd-subject" class="inp" style="font-size:13px;"></select>
+            <input type="text" id="gd-title" required class="inp" placeholder="Topic / Chapter">
+          </div>
+          <textarea id="gd-desc" required rows="2" class="inp" placeholder="Describe your doubt clearly..."></textarea>
+          <div id="gd-similar-hint" class="hidden" style="font-size:11px;color:var(--amber);background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:7px 10px;"></div>
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+            <span style="font-size:11px;color:var(--dim);font-weight:600;">Visible to:</span>
+            <button type="button" class="vis-btn active" id="gd-vis-public" onclick="setDoubtVisibility('gd',true)">Everyone</button>
+            <button type="button" class="vis-btn" id="gd-vis-private" onclick="setDoubtVisibility('gd',false)">Teacher Only</button>
+            <label style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--red);margin-left:auto;"><input type="checkbox" id="gd-urgent" style="width:auto;accent-color:var(--red);"> Urgent</label>
+          </div>
+          <button type="submit" class="btn btn-purple btn-sm" style="width:100%;justify-content:center;"><i class="fa-solid fa-paper-plane"></i> Submit Doubt</button>
+        </form>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <div class="sort-bar">
+          <button class="sort-pill active" id="gd-sort-latest" onclick="toggleGlobalDoubtSorting('latest')">Latest</button>
+          <button class="sort-pill" id="gd-sort-popular" onclick="toggleGlobalDoubtSorting('popular')">Top Voted</button>
+        </div>
+        <div class="sort-bar">
+          <button class="sort-pill active" id="gd-filter-all" onclick="toggleGlobalDoubtFilter('all')">All</button>
+          <button class="sort-pill" id="gd-filter-unanswered" onclick="toggleGlobalDoubtFilter('unanswered')">Unanswered</button>
+          <button class="sort-pill" id="gd-filter-mine" onclick="toggleGlobalDoubtFilter('mine')">Mine</button>
+        </div>
+      </div>
+      <div id="my-doubts-list"></div>
+    </div>
+
+    <div id="page-profile" class="main-page p-6" style="max-width:480px;margin:0 auto;">
+      <div class="glass" style="border-radius:20px;padding:24px;">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid var(--border);">
+          <img id="prof-avatar-large" src="" style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid var(--border);">
+          <div><div id="prof-name-display" style="font-weight:800;font-size:1.05rem;"></div><div id="prof-email-display" style="font-size:12px;color:var(--dim);margin-top:3px;"></div></div>
+        </div>
+        <form id="profile-form" style="display:flex;flex-direction:column;gap:10px;">
+          <input type="text" id="prof-name-input" class="inp" placeholder="Display name">
+          <input type="url" id="prof-pfp-input" class="inp" placeholder="Photo URL">
+          <button type="submit" class="btn btn-purple" style="width:100%;justify-content:center;"><i class="fa-solid fa-floppy-disk"></i> Save Profile</button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="dock-wrap">
+    <div class="dock">
+      <div class="dock-btn on" onclick="switchMainPage('live')" data-dp="live"><div class="icon"><i class="fa-solid fa-tower-broadcast"></i></div><div class="label">Live</div></div>
+      <div class="dock-btn" onclick="switchMainPage('recorded')" data-dp="recorded"><div class="icon"><i class="fa-solid fa-clapperboard"></i></div><div class="label">Recorded</div></div>
+      <div class="dock-btn" onclick="switchMainPage('pdfs')" data-dp="pdfs"><div class="icon"><i class="fa-solid fa-file-pdf"></i></div><div class="label">Notes</div></div>
+      <div class="dock-btn" onclick="switchMainPage('my-doubts')" data-dp="my-doubts"><div class="icon"><i class="fa-solid fa-circle-question"></i></div><div class="label">Doubts</div></div>
+      <div class="dock-btn" onclick="switchMainPage('profile')" data-dp="profile"><div class="icon"><i class="fa-solid fa-user"></i></div><div class="label">Profile</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- PLAYER -->
+<div id="player-view" class="hidden" style="height:100vh;display:flex;flex-direction:column;position:fixed;inset:0;z-index:150;background:linear-gradient(135deg,var(--bg-a) 0%,var(--bg-b) 40%,var(--bg-c) 70%,var(--bg-d) 100%);">
+  <div style="height:52px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:rgba(255,255,255,0.5);border-bottom:1px solid var(--border);backdrop-filter:blur(28px);">
+    <button onclick="closePlayer()" class="btn btn-ghost btn-sm"><i class="fa-solid fa-arrow-left"></i> Back</button>
+    <div class="brand" style="font-size:0.95rem;">ASTRO<span style="color:var(--purple);">CORE</span></div>
+    <img id="player-avatar-small" src="" style="width:28px;height:28px;border-radius:50%;object-fit:cover;border:1.5px solid var(--border);">
+  </div>
+
+  <div style="display:flex;flex:1;overflow:hidden;padding:12px;gap:12px;">
+    <div style="flex:1;background:rgba(255,255,255,0.6);border:1px solid var(--border);border-radius:20px;overflow:hidden;display:flex;flex-direction:column;backdrop-filter:blur(20px);">
+      <div id="player-content-switch" class="hidden" style="flex-shrink:0;display:flex;align-items:center;gap:6px;padding:8px 12px;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.4);"></div>
+      <div id="player-offline" class="hidden" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+        <i class="fa-solid fa-video-slash" style="font-size:2.5rem;color:var(--dim);margin-bottom:12px;opacity:0.4;"></i>
+        <h3 style="font-size:14px;font-weight:700;color:var(--dim);">Stream Offline</h3>
+      </div>
+      <iframe id="main-video-frame" style="flex:1;width:100%;border:none;background:#000;" src="" allowfullscreen></iframe>
+      <div style="padding:10px 16px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.5);border-top:1px solid var(--border);">
+        <div><h3 id="player-video-title" style="font-weight:800;font-size:13px;color:var(--text);"></h3></div>
+        <span id="player-video-subject" class="badge badge-purple"></span>
+      </div>
+    </div>
+
+    <div style="width:300px;flex-shrink:0;background:rgba(255,255,255,0.55);border:1px solid var(--border);border-radius:20px;display:flex;flex-direction:column;overflow:hidden;backdrop-filter:blur(28px);position:relative;">
+
+      <div id="s-poll-overlay" class="poll-overlay hidden">
+        <div style="padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+          <span style="font-family:var(--ff-ui);font-size:0.62rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--purple);"><i class="fa-solid fa-circle-nodes"></i> Live Poll</span>
+          <span class="badge badge-red"><i class="fa-solid fa-stopwatch"></i> <span id="s-poll-timer">30</span>s</span>
+        </div>
+        <div style="height:3px;flex-shrink:0;background:rgba(0,0,0,0.05);"><div id="s-poll-progress" style="height:100%;background:linear-gradient(90deg,var(--purple),var(--orange));transition:width 0.5s linear;width:100%;"></div></div>
+        <div style="flex:1;overflow-y:auto;padding:16px;">
+          <h4 id="s-poll-question" style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;line-height:1.5;"></h4>
+          <div id="s-poll-options"></div>
+        </div>
+      </div>
+
+      <div id="player-tabs" style="display:flex;border-bottom:1px solid var(--border);flex-shrink:0;background:rgba(255,255,255,0.4);"></div>
+
+      <div id="pview-chat" class="hidden" style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+        <div id="pinned-msg-bar" class="hidden" style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(147,51,234,0.06);border-bottom:1px solid rgba(147,51,234,0.15);font-size:11.5px;flex-shrink:0;">
+          <i class="fa-solid fa-thumbtack" style="color:var(--purple);"></i>
+          <span id="pinned-msg-text" style="flex:1;font-weight:600;" class="trunc"></span>
+        </div>
+        <div id="player-chat-box" style="flex:1;overflow-y:auto;padding:12px;"></div>
+        <form id="player-chat-form" style="border-top:1px solid var(--border);padding:10px;display:flex;gap:8px;background:rgba(255,255,255,0.5);flex-shrink:0;">
+          <button type="button" id="hand-raise-btn" onclick="toggleHandRaise()" class="btn btn-ghost" style="padding:8px 10px;border-radius:10px;" title="Raise hand"><i class="fa-regular fa-hand"></i></button>
+          <input type="text" id="player-chat-input" autocomplete="off" placeholder="Send a message..." required class="inp flex-1" style="padding:8px 12px;border-radius:10px;font-size:12.5px;">
+          <button type="submit" class="btn btn-purple" style="padding:8px 12px;border-radius:10px;"><i class="fa-solid fa-paper-plane"></i></button>
+        </form>
+      </div>
+
+      <div id="pview-doubts" class="hidden" style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+        <div class="sort-bar" style="margin:8px 10px 4px;">
+          <button class="sort-pill active" id="ld-sort-latest" onclick="toggleLiveDoubtSorting('latest')">Latest</button>
+          <button class="sort-pill" id="ld-sort-popular" onclick="toggleLiveDoubtSorting('popular')">Top Voted</button>
+        </div>
+        <div id="player-doubts-list" style="flex:1;overflow-y:auto;padding:8px 12px;"></div>
+        <form id="player-doubt-form" style="border-top:1px solid var(--border);padding:10px;background:rgba(255,255,255,0.5);flex-shrink:0;display:flex;flex-direction:column;gap:7px;">
+          <textarea id="player-doubt-input" rows="2" placeholder="Ask a doubt regarding this class..." required class="inp" style="padding:8px 12px;border-radius:10px;font-size:12.5px;resize:none;"></textarea>
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+            <span style="font-size:10.5px;color:var(--dim);font-weight:600;">Visible to:</span>
+            <button type="button" class="vis-btn active" id="ld-vis-public" onclick="setDoubtVisibility('ld',true)">Everyone</button>
+            <button type="button" class="vis-btn" id="ld-vis-private" onclick="setDoubtVisibility('ld',false)">Teacher Only</button>
+            <label style="display:flex;align-items:center;gap:4px;font-size:10.5px;font-weight:600;color:var(--red);margin-left:auto;"><input type="checkbox" id="ld-urgent" style="width:auto;accent-color:var(--red);"> Urgent</label>
+          </div>
+          <button type="submit" class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;">Submit Doubt</button>
+        </form>
+      </div>
+
+      <div id="pview-leaderboard" class="hidden" style="flex:1;overflow-y:auto;padding:12px;">
+        <div style="font-family:var(--ff-ui);font-size:0.58rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--dim);margin-bottom:10px;"><i class="fa-solid fa-square-poll-vertical"></i> Session Polls</div>
+        <div id="s-polls-list" style="display:flex;flex-direction:column;gap:9px;"></div>
+      </div>
+
+      <div id="pview-bookmarks" class="hidden" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;">
+        <div style="width:48px;height:48px;border-radius:14px;background:rgba(147,51,234,0.08);display:flex;align-items:center;justify-content:center;color:var(--purple);font-size:1.2rem;margin-bottom:12px;"><i class="fa-solid fa-circle-check"></i></div>
+        <h3 style="font-weight:700;font-size:13px;color:var(--text);margin-bottom:6px;">Recorded Lecture</h3>
+        <p style="font-size:12px;color:var(--dim);line-height:1.6;">Contextual doubts for this specific recording are shown in the tab above.</p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, onSnapshot, query, where, orderBy, doc, setDoc, updateDoc, deleteDoc, getDocs, getDoc, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+
+// This is your Firebase project's PUBLIC client config — Firebase web apps are designed
+// to ship this in the page (it identifies your project, it does not grant admin access).
+// The real secret credential lives only on the server, in Vercel's environment variables
+// (see api/admin/*.js + README "Backend setup") and is never in this file.
+const firebaseConfig = { apiKey: "AIzaSyCxnF7VFBeIhzFzUueKpW2wQGg8_wCkm58", authDomain: "school-astra.firebaseapp.com", projectId: "school-astra", storageBucket: "school-astra.firebasestorage.app" };
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null, isSignUp = false;
+let allMaterials = [], foldersList = [];
+let currentClassContext = null, isLiveSession = false, currentMaterialData = null;
+let activeChatUnsub = null, activeDoubtUnsub = null, activePollUnsub = null, myDoubtUnsub = null;
+let pollTimerInterval = null, hasVotedCurrent = false, chatPurgeInterval = null;
+let activeRecordedFolder = 'all', activePdfFolder = 'all';
+let watchedMap = {};
+let liveDoubtSortCriteria = 'latest', globalDoubtSortCriteria = 'latest';
+let doubtVisibility = { gd: true, ld: true }; // true = public/everyone, false = teacher-only
+window.setDoubtVisibility = (scope, isPublic) => {
+  doubtVisibility[scope] = isPublic;
+  document.getElementById(scope+'-vis-public').classList.toggle('active', isPublic);
+  document.getElementById(scope+'-vis-private').classList.toggle('active', !isPublic);
+};
+let connErrorCount = 0;
+const CHAT_TTL_MS = 30000;
+
+function esc(s) { return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,"&#39;").replace(/"/g,'&quot;'); }
+// Safely embed a JS string literal inside a single-quoted inline onclick="" attribute.
+// JSON.stringify() alone isn't enough: it doesn't escape single quotes, so any title/message
+// containing an apostrophe (e.g. "Newton's Laws") would prematurely close the attribute and
+// break the markup. Escaping the quote as an HTML entity keeps it intact through HTML parsing.
+function attrStr(s) { return JSON.stringify(s == null ? '' : s).replace(/'/g, '&#39;'); }
+function toast(msg) {
+  const wrap = document.getElementById('toast-wrap');
+  const t = document.createElement('div'); t.className = 'toast fu'; t.innerText = msg;
+  wrap.appendChild(t); setTimeout(() => t.remove(), 3200);
+}
+function timeAgo(ts) {
+  if (!ts) return '';
+  const ms = ts.toMillis ? ts.toMillis() : ts;
+  const diff = Math.max(0, Date.now() - ms);
+  const m = Math.floor(diff/60000);
+  if (m < 1) return 'just now';
+  if (m < 60) return m + 'm ago';
+  const h = Math.floor(m/60); if (h < 24) return h + 'h ago';
+  return Math.floor(h/24) + 'd ago';
+}
+function markConnOk() { connErrorCount = 0; const b=document.getElementById('conn-badge'); if(b){b.classList.remove('err');document.getElementById('conn-txt').innerText='Live';} }
+let lastErrToastAt = 0;
+function markConnErr(err) {
+  connErrorCount++;
+  console.error('Firestore error:', err);
+  const b=document.getElementById('conn-badge'); if(b){b.classList.add('err');document.getElementById('conn-txt').innerText='Sync issue';}
+  const now = Date.now();
+  if (now - lastErrToastAt > 4000) { lastErrToastAt = now; toast('Connection hiccup — retrying…'); }
+}
+
+function getEmbedUrl(url) {
+  if (!url) return '';
+  if (url.includes('youtube.com/watch')) { try { return `https://www.youtube.com/embed/${new URL(url).searchParams.get('v')}`; } catch(e) { return url; } }
+  if (url.includes('youtu.be/')) return `https://www.youtube.com/embed/${url.split('youtu.be/')[1].split('?')[0]}`;
+  return url;
+}
+// Accepts either a normal "share" link (.../presentation/d/{id}/edit#...) or an already-embed
+// link (.../presentation/d/{id}/embed) and always returns a live, auto-advancing embed URL.
+function getSlidesEmbedUrl(url) {
+  if (!url) return '';
+  const m = url.match(/\/presentation\/d\/([a-zA-Z0-9_-]+)/);
+  if (m) return `https://docs.google.com/presentation/d/${m[1]}/embed?start=false&loop=false&delayms=3000`;
+  return url;
+}
+function getThumb(url) {
+  const embed = getEmbedUrl(url); const id = embed.split('/embed/')[1];
+  return id ? `https://img.youtube.com/vi/${id}/mqdefault.jpg` : '';
+}
+
+// ---- Server-side, per-user upvote (works across devices; one vote per uid per target) ----
+async function castUpvote(collectionPath, targetId) {
+  if (!currentUser) return;
+  const voteId = currentUser.uid + '_' + targetId;
+  const voteRef = doc(db, 'votes', voteId);
+  const targetRef = doc(db, collectionPath, targetId);
+  try {
+    await runTransaction(db, async (tx) => {
+      const voteSnap = await tx.get(voteRef);
+      if (voteSnap.exists()) throw new Error('ALREADY_VOTED');
+      const targetSnap = await tx.get(targetRef);
+      if (!targetSnap.exists()) throw new Error('NOT_FOUND');
+      const cur = targetSnap.data().upvotes || 0;
+      tx.set(voteRef, { uid: currentUser.uid, targetId, collectionPath, timestamp: serverTimestamp() });
+      tx.update(targetRef, { upvotes: cur + 1 });
+    });
+  } catch(e) {
+    if (e.message === 'ALREADY_VOTED') toast('You already upvoted this.');
+    else if (e.message !== 'NOT_FOUND') { console.error(e); toast('Could not register upvote.'); }
+  }
+}
+async function hasVotedFor(targetId) {
+  if (!currentUser) return false;
+  try { const s = await getDoc(doc(db, 'votes', currentUser.uid + '_' + targetId)); return s.exists(); }
+  catch(e) { return false; }
+}
+
+document.getElementById('toggle-auth-btn').addEventListener('click', () => {
+  isSignUp = !isSignUp;
+  document.getElementById('auth-btn').innerHTML = isSignUp ? '<i class="fa-solid fa-user-plus"></i> Create Account' : '<i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In';
+  document.getElementById('auth-subtitle').innerText = isSignUp ? 'Create Account' : 'Student Portal';
+  document.getElementById('toggle-auth-btn').innerText = isSignUp ? 'Back to Sign In' : 'Create an account';
+});
+
+document.getElementById('auth-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('auth-email').value, pass = document.getElementById('auth-pass').value;
+  const errEl = document.getElementById('auth-error');
+  errEl.classList.add('hidden');
+  const btn = document.getElementById('auth-btn'); btn.disabled = true;
+  try {
+    if (isSignUp) {
+      const nu = await createUserWithEmailAndPassword(auth, email, pass);
+      await setDoc(doc(db,"users",nu.user.uid), { role:"student", email, displayName: email.split('@')[0] });
+      await updateProfile(nu.user, { displayName: email.split('@')[0] });
+    } else { await signInWithEmailAndPassword(auth, email, pass); }
+  } catch(err) { errEl.innerText = err.message; errEl.classList.remove('hidden'); }
+  btn.disabled = false;
+});
+
+document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
+
+document.getElementById('forgot-pass-btn').addEventListener('click', async () => {
+  const email = document.getElementById('auth-email').value.trim();
+  const errEl = document.getElementById('auth-error'), okEl = document.getElementById('auth-reset-msg');
+  if (!email) { errEl.textContent = 'Enter your email above first.'; errEl.classList.remove('hidden'); okEl.classList.add('hidden'); return; }
+  try {
+    await sendPasswordResetEmail(auth, email);
+    errEl.classList.add('hidden');
+    okEl.textContent = 'Reset link sent to ' + email + '. Check your inbox.';
+    okEl.classList.remove('hidden');
+  } catch(err) { okEl.classList.add('hidden'); errEl.textContent = err.message; errEl.classList.remove('hidden'); }
+});
+
+// Dark mode — preference remembered per-account (users/{uid}.theme)
+function applyTheme(t) { document.body.classList.toggle('dark', t === 'dark'); const i = document.getElementById('theme-toggle-btn')?.querySelector('i'); if (i) i.className = t === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon'; }
+window.toggleTheme = async () => {
+  const next = document.body.classList.contains('dark') ? 'light' : 'dark';
+  applyTheme(next);
+  if (currentUser) try { await setDoc(doc(db,'users',currentUser.uid), { theme: next }, { merge: true }); } catch(e) {}
+};
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    currentUser = user;
+    document.getElementById('auth-section').classList.add('hidden');
+    document.getElementById('dashboard-view').classList.remove('hidden');
+    const name = user.displayName || 'Student';
+    const pfp = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=f3e8ff&color=9333ea&bold=true`;
+    document.getElementById('header-user-name').innerText = name;
+    ['header-avatar','player-avatar-small','prof-avatar-large'].forEach(id => { const el = document.getElementById(id); if(el) el.src = pfp; });
+    document.getElementById('prof-name-display').innerText = name;
+    document.getElementById('prof-email-display').innerText = user.email;
+    document.getElementById('prof-name-input').value = name;
+    document.getElementById('prof-pfp-input').value = user.photoURL || '';
+    initDashboard();
+  } else {
+    document.getElementById('auth-section').classList.remove('hidden');
+    document.getElementById('dashboard-view').classList.add('hidden');
+    document.getElementById('player-view').classList.add('hidden');
+  }
+});
+
+window.switchMainPage = (p) => {
+  document.querySelectorAll('.main-page').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.dock-btn').forEach(el => el.classList.remove('on'));
+  document.getElementById(`page-${p}`).classList.add('active');
+  const btn = document.querySelector(`.dock-btn[data-dp="${p}"]`);
+  if(btn) btn.classList.add('on');
+  if (p === 'my-doubts') bindMyDoubts();
+};
+
+window.switchLiveSubTab = (t) => {
+  document.getElementById('live-grid-now').classList.toggle('hidden', t !== 'now');
+  document.getElementById('live-grid-ended').classList.toggle('hidden', t !== 'ended');
+  document.getElementById('subtab-live-now').classList.toggle('active', t === 'now');
+  document.getElementById('subtab-live-ended').classList.toggle('active', t === 'ended');
+};
+
+function initDashboard() {
+  onSnapshot(doc(db, "users", currentUser.uid), (ds) => {
+    const d = ds.data() || {};
+    applyTheme(d.theme || 'light');
+    watchedMap = d.watched || {};
+    renderRecordedGrid();
+  }, markConnErr);
+
+  onSnapshot(collection(db, "folders"), (snap) => {
+    foldersList = [];
+    const selectEl = document.getElementById('gd-subject'); selectEl.innerHTML = '';
+    snap.forEach(dDoc => {
+      const fData = dDoc.data(); fData.id = dDoc.id; foldersList.push(fData);
+      selectEl.innerHTML += `<option value="${esc(fData.name)}">${esc(fData.name)}</option>`;
+    });
+    refreshCategoryPills();
+    markConnOk();
+  }, markConnErr);
+
+  onSnapshot(query(collection(db,"materials"), orderBy("timestamp","desc")), (snapshot) => {
+    allMaterials = []; snapshot.forEach(ds => { const d = ds.data(); d.id = ds.id; allMaterials.push(d); });
+    renderRecordedGrid(); renderPdfGrid();
+    markConnOk();
+  }, markConnErr);
+
+
+  onSnapshot(query(collection(db,"live_sessions"), where("active","==",true)), (snapshot) => {
+    const grid = document.getElementById('live-grid-now'); grid.innerHTML = '';
+    if (snapshot.empty) {
+      grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--dim);"><i class="fa-solid fa-tower-broadcast" style="font-size:2.5rem;opacity:0.2;display:block;margin-bottom:14px;"></i><p style="font-size:13px;font-weight:600;">No live sessions right now.</p></div>`;
+      return;
+    }
+    snapshot.forEach(ds => {
+      const d = ds.data(); const tImg = getThumb(d.url);
+      const content = { video: d.url || '', pdf: d.pdfUrl || '', slides: d.slidesUrl || '' };
+      const typeBadges = [d.url ? '<i class="fa-solid fa-video"></i>' : '', d.slidesUrl ? '<i class="fa-solid fa-display"></i>' : '', d.pdfUrl ? '<i class="fa-solid fa-file-pdf"></i>' : ''].filter(Boolean).join(' ');
+      grid.innerHTML += `
+      <div class="vid-card fu" onclick='openPlayer(${attrStr(ds.id)},${attrStr(content)},${attrStr(d.title||"")},${attrStr(d.folderName||"")},true)'>
+        <div class="vid-thumb">
+          ${tImg ? `<img src="${tImg}" alt="">` : ''}
+          <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(26,16,53,0.85) 0%,transparent 60%);"></div>
+          <span class="badge badge-red" style="position:absolute;top:10px;left:10px;"><span class="lpulse" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--red);margin-right:4px;"></span>LIVE</span>
+          ${typeBadges ? `<span style="position:absolute;top:10px;right:10px;color:rgba(255,255,255,0.9);font-size:11px;display:flex;gap:6px;">${typeBadges}</span>` : ''}
+          <div style="position:absolute;bottom:0;left:0;right:0;padding:14px;">
+            <span style="font-size:10px;color:rgba(255,255,255,0.7);font-weight:700;display:block;margin-bottom:4px;">${esc(d.folderName || '')}</span>
+            <h4 style="font-weight:800;color:white;font-size:13px;line-height:1.3;">${esc(d.title)}</h4>
+          </div>
+        </div>
+      </div>`;
+    });
+    markConnOk();
+  }, markConnErr);
+
+  // Ended sessions: no orderBy in the query (avoids needing a composite index) — sort client-side instead.
+  onSnapshot(query(collection(db,"live_sessions"), where("active","==",false)), (snapshot) => {
+    const grid = document.getElementById('live-grid-ended'); grid.innerHTML = '';
+    if (snapshot.empty) { grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--dim);font-size:13px;">No ended sessions yet.</div>`; return; }
+    let items = []; snapshot.forEach(ds => items.push({id:ds.id, ...ds.data()}));
+    items.sort((a,b) => (b.endedAt?.toMillis?.()||0) - (a.endedAt?.toMillis?.()||0));
+    items.forEach(d => {
+      grid.innerHTML += `
+      <div class="glass fu" style="border-radius:16px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <p style="font-weight:700;font-size:13px;color:var(--text);">${esc(d.title)}</p>
+          <span style="font-size:11px;color:var(--dim);margin-top:3px;display:block;"><i class="fa-solid fa-folder"></i> ${esc(d.folderName || '')}</span>
+        </div>
+        <span class="badge badge-green">Ended</span>
+      </div>`;
+    });
+    markConnOk();
+  }, markConnErr);
+
+  document.getElementById('profile-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const nName = document.getElementById('prof-name-input').value;
+    const nPic = document.getElementById('prof-pfp-input').value;
+    try {
+      await updateProfile(auth.currentUser, { displayName: nName, photoURL: nPic||null });
+      await setDoc(doc(db,"users",auth.currentUser.uid), { displayName: nName, photoURL: nPic||'' }, { merge: true });
+      toast('Profile saved'); window.location.reload();
+    } catch(err) { toast('Could not save profile: ' + err.message); }
+  });
+
+  document.getElementById('global-doubt-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type=submit]'); btn.disabled = true;
+    try {
+      await addDoc(collection(db,"doubts"), {
+        subject: document.getElementById('gd-subject').value,
+        title: document.getElementById('gd-title').value,
+        description: document.getElementById('gd-desc').value,
+        studentName: currentUser.displayName || 'Student',
+        studentId: currentUser.uid,
+        visibility: doubtVisibility.gd ? 'public' : 'private',
+        urgent: document.getElementById('gd-urgent').checked,
+        upvotes: 0, timestamp: serverTimestamp()
+      });
+      e.target.reset(); setDoubtVisibility('gd', true); toast('Doubt submitted');
+    } catch(err) { toast('Could not submit doubt: ' + err.message); }
+    btn.disabled = false;
+  });
+}
+
+function refreshCategoryPills() {
+  const rTabs = document.getElementById('recorded-folder-tabs'); rTabs.innerHTML = '';
+  const pTabs = document.getElementById('pdf-folder-tabs'); pTabs.innerHTML = '';
+  foldersList.forEach(f => {
+    rTabs.innerHTML += `<button class="folder-pill" id="rf-${f.id}" onclick="filterRecorded('${f.id}')">${esc(f.name)}</button>`;
+    pTabs.innerHTML += `<button class="folder-pill" id="pf-${f.id}" onclick="filterPDFs('${f.id}')">${esc(f.name)}</button>`;
+  });
+}
+
+window.filterRecorded = (fid) => {
+  activeRecordedFolder = fid;
+  document.querySelectorAll('#page-recorded .folder-pill').forEach(el => el.classList.remove('active'));
+  const el = document.getElementById(fid === 'all' ? 'rf-all' : 'rf-' + fid); if(el) el.classList.add('active');
+  renderRecordedGrid();
+};
+window.filterPDFs = (fid) => {
+  activePdfFolder = fid;
+  document.querySelectorAll('#page-pdfs .folder-pill').forEach(el => el.classList.remove('active'));
+  const el = document.getElementById(fid === 'all' ? 'pf-all' : 'pf-' + fid); if(el) el.classList.add('active');
+  renderPdfGrid();
+};
+
+// Per-student "watched" state, stored at users/{uid}.watched.{materialId} so it's private
+// to that student and survives across devices.
+window.toggleWatched = async (id, ev) => {
+  ev.stopPropagation();
+  if (!currentUser) return;
+  const next = !watchedMap[id];
+  watchedMap[id] = next;
+  document.querySelectorAll(`.watch-check[data-wid="${id}"]`).forEach(el => el.classList.toggle('done', next));
+  try { await setDoc(doc(db, 'users', currentUser.uid), { ['watched.' + id]: next }, { merge: true }); }
+  catch (e) { toast('Could not save.'); watchedMap[id] = !next; }
+};
+
+function renderRecordedGrid() {
+  const grid = document.getElementById('recorded-grid');
+  const items = allMaterials.filter(m => (m.type === 'video' || m.type === 'slides') && (activeRecordedFolder === 'all' || m.folderId === activeRecordedFolder));
+  document.getElementById('recorded-empty').classList.toggle('hidden', items.length > 0);
+  grid.innerHTML = items.map(d => {
+    const content = { video: d.type === 'video' ? (d.url || '') : '', pdf: d.pdfUrl || '', slides: d.type === 'slides' ? (d.url || '') : (d.slidesUrl || '') };
+    const isWatched = !!watchedMap[d.id];
+    const tImg = d.type === 'video' ? getThumb(d.url) : '';
+    return `
+    <div class="vid-card fu" style="position:relative;" onclick='openPlayer(${attrStr(d.id)},${attrStr(content)},${attrStr(d.title||"")},${attrStr(d.folderName||"")},false)'>
+      <div class="watch-check ${isWatched ? 'done' : ''}" data-wid="${d.id}" title="Mark as watched" onclick="toggleWatched('${d.id}', event)"><i class="fa-solid fa-check" style="font-size:11px;"></i></div>
+      <div class="vid-thumb">
+        ${tImg ? `<img src="${tImg}" alt="">` : (d.type === 'slides' ? `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--purple);font-size:1.8rem;opacity:0.5;"><i class="fa-solid fa-display"></i></div>` : '')}
+        <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(26,16,53,0.75) 0%,transparent 55%);"></div>
+        <div style="position:absolute;bottom:0;left:0;right:0;padding:14px;">
+          <span style="font-size:10px;color:rgba(255,255,255,0.7);font-weight:700;display:block;margin-bottom:4px;">${esc(d.folderName||'')}${d.type === 'slides' ? ' · Slides' : ''}</span>
+          <h4 style="font-weight:800;color:white;font-size:13px;line-height:1.3;">${esc(d.title)}</h4>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderPdfGrid() {
+  const grid = document.getElementById('pdf-grid');
+  const items = allMaterials.filter(m => m.type === 'pdf' && (activePdfFolder === 'all' || m.folderId === activePdfFolder));
+  document.getElementById('pdf-empty').classList.toggle('hidden', items.length > 0);
+  grid.innerHTML = items.map(d => `
+    <a href="${esc(d.url)}" target="_blank" class="pdf-card fu" style="text-decoration:none;color:inherit;display:block;">
+      <div style="width:34px;height:34px;border-radius:9px;background:rgba(147,51,234,0.1);display:flex;align-items:center;justify-content:center;color:var(--purple);margin-bottom:8px;"><i class="fa-solid fa-file-pdf"></i></div>
+      <h4 style="font-weight:700;font-size:12px;color:var(--text);line-height:1.35;">${esc(d.title)}</h4>
+      <span style="font-size:10px;color:var(--dim);">${esc(d.folderName||'')}</span>
+    </a>`).join('');
+}
+
+// ---- General (unlinked) doubts feed ----
+let globalDoubtFilter = 'all';
+window.toggleGlobalDoubtSorting = type => {
+  globalDoubtSortCriteria = type;
+  document.getElementById('gd-sort-latest').classList.toggle('active', type === 'latest');
+  document.getElementById('gd-sort-popular').classList.toggle('active', type === 'popular');
+  bindMyDoubts();
+};
+window.toggleGlobalDoubtFilter = f => {
+  globalDoubtFilter = f;
+  document.getElementById('gd-filter-all').classList.toggle('active', f === 'all');
+  document.getElementById('gd-filter-unanswered').classList.toggle('active', f === 'unanswered');
+  document.getElementById('gd-filter-mine').classList.toggle('active', f === 'mine');
+  bindMyDoubts();
+};
+
+function bindMyDoubts() {
+  if (myDoubtUnsub) myDoubtUnsub();
+  const q = globalDoubtSortCriteria === 'popular'
+    ? query(collection(db,"doubts"), orderBy("upvotes","desc"))
+    : query(collection(db,"doubts"), orderBy("timestamp","desc"));
+
+  myDoubtUnsub = onSnapshot(q, async (snapshot) => {
+    const list = document.getElementById('my-doubts-list'); list.innerHTML = '';
+    let docs = snapshot.docs;
+    // A private doubt is only visible to its author and the teacher (admin has its own separate panel).
+    docs = docs.filter(ds => ds.data().visibility !== 'private' || ds.data().studentId === currentUser.uid);
+    if (globalDoubtFilter === 'unanswered') docs = docs.filter(ds => !ds.data().answer);
+    if (globalDoubtFilter === 'mine') docs = docs.filter(ds => ds.data().studentId === currentUser.uid);
+    if (!docs.length) { list.innerHTML = '<p style="color:var(--dim);font-size:13px;text-align:center;padding:30px;">No doubts to show.</p>'; markConnOk(); return; }
+
+    // Group by subject, then keep same-topic doubts adjacent, within the chosen sort order.
+    const items = docs.map(ds => ({ id: ds.id, ...ds.data() }));
+    items.sort((a,b) => {
+      const sa = (a.subject||'General'), sb = (b.subject||'General');
+      if (sa !== sb) return sa.localeCompare(sb);
+      const ta = (a.title||''), tb = (b.title||'');
+      if (ta !== tb) return ta.localeCompare(tb);
+      return 0; // preserve the query's own sort (latest/popular) within a topic group
+    });
+
+    let lastSubject = null, lastTitle = null;
+    items.forEach(d => {
+      const isAns = !!d.answer;
+      const isPrivate = d.visibility === 'private';
+      const isUrgent = !!d.urgent;
+      const subject = d.subject || 'General';
+      const initial = (d.studentName || 'S').trim().charAt(0).toUpperCase();
+      if (subject !== lastSubject) { list.innerHTML += `<div class="subj-divider"><i class="fa-solid fa-layer-group"></i> ${esc(subject)}</div>`; lastSubject = subject; lastTitle = null; }
+      const showTopicTag = d.title && d.title !== lastTitle;
+      lastTitle = d.title || lastTitle;
+      list.innerHTML += `
+      <div class="dc ${isAns ? 'ans' : ''} ${isUrgent && !isAns ? 'urgent' : ''} fu" data-doubt-id="${d.id}">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+          <span class="dc-avatar">${esc(initial)}</span>
+          ${isAns ? `<span class="badge badge-green" style="font-size:9px;">Answered</span>` : `<span class="badge badge-yellow" style="font-size:9px;">Pending</span>`}
+          ${isUrgent ? `<span class="badge badge-red" style="font-size:9px;"><i class="fa-solid fa-triangle-exclamation"></i> Urgent</span>` : ''}
+          ${isPrivate ? `<span class="badge badge-red" style="font-size:9px;"><i class="fa-solid fa-lock"></i> Teacher Only</span>` : ''}
+          <span style="font-size:10px;color:var(--dim);margin-left:auto;">${esc(d.studentName)} · ${timeAgo(d.timestamp)}</span>
+        </div>
+        ${showTopicTag ? `<span class="topic-tag">${esc(d.title)}</span>` : ''}
+        <p style="font-size:12.5px;color:var(--dim);line-height:1.6;margin-bottom:8px;">${esc(d.description)}</p>
+        ${isAns ? `<div style="border-radius:10px;padding:10px 12px;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.15);"><p style="font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">Teacher's Answer</p><p style="font-size:12.5px;color:var(--text);">${esc(d.answer)}</p></div>` : ''}
+        <div style="display:flex;align-items:center;gap:6px;margin-top:8px;">
+          <button class="upvote-btn" data-id="${d.id}" style="background:rgba(147,51,234,0.08);border:1px solid rgba(147,51,234,0.15);color:var(--purple);border-radius:8px;padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--ff-body);transition:all 0.2s;">
+            <i class="fa-solid fa-heart"></i> ${d.upvotes || 0}
+          </button>
+        </div>
+      </div>`;
+    });
+    markConnOk();
+
+    // Grey out buttons the current user already voted on
+    list.querySelectorAll('.upvote-btn').forEach(async btn => {
+      const id = btn.dataset.id;
+      if (await hasVotedFor(id)) { btn.disabled = true; btn.style.opacity = '0.5'; btn.style.cursor='not-allowed'; btn.innerHTML = btn.innerHTML + ' <span style="font-size:9px;">(voted)</span>'; }
+    });
+    list.querySelectorAll('.upvote-btn').forEach(btn => {
+      btn.addEventListener('click', () => { btn.disabled = true; castUpvote('doubts', btn.dataset.id); });
+    });
+  }, markConnErr);
+}
+
+// ---- Player ----
+let currentContentSet = {};
+window.openPlayer = (contextId, content, title, subfolderName, isLive) => {
+  currentClassContext = contextId; isLiveSession = !!isLive; hasVotedCurrent = false;
+  currentMaterialData = allMaterials.find(m => m.id === contextId) || null;
+  document.getElementById('dashboard-view').classList.add('hidden');
+  document.getElementById('player-view').classList.remove('hidden');
+  setupPlayerContent(content);
+  document.getElementById('player-video-title').innerText = title;
+  document.getElementById('player-video-subject').innerText = subfolderName;
+  setupPlayerTabs(isLive);
+};
+
+// A session/lecture can carry a video, a PDF, and a Google Slides link at once — this builds
+// the little switcher (only shown when more than one is present) and loads the first one.
+function setupPlayerContent(content) {
+  currentContentSet = content || {};
+  const switchWrap = document.getElementById('player-content-switch');
+  const types = [];
+  if (currentContentSet.video) types.push('video');
+  if (currentContentSet.slides) types.push('slides');
+  if (currentContentSet.pdf) types.push('pdf');
+  const LABEL = { video: '<i class="fa-solid fa-video"></i> Video', slides: '<i class="fa-solid fa-display"></i> Slides', pdf: '<i class="fa-solid fa-file-pdf"></i> PDF' };
+  if (types.length > 1) {
+    switchWrap.innerHTML = types.map(t => `<button class="content-switch-btn" data-ct="${t}" onclick="showPlayerContent('${t}')">${LABEL[t]}</button>`).join('');
+    switchWrap.classList.remove('hidden');
+  } else { switchWrap.innerHTML = ''; switchWrap.classList.add('hidden'); }
+  showPlayerContent(types[0] || null);
+}
+
+window.showPlayerContent = (type) => {
+  const frame = document.getElementById('main-video-frame');
+  const offline = document.getElementById('player-offline');
+  let src = '';
+  if (type === 'video') src = getEmbedUrl(currentContentSet.video) + '?autoplay=1';
+  else if (type === 'slides') src = getSlidesEmbedUrl(currentContentSet.slides);
+  else if (type === 'pdf') src = currentContentSet.pdf;
+  if (src) { frame.src = src; offline.classList.add('hidden'); }
+  else { frame.src = ''; offline.classList.remove('hidden'); }
+  document.querySelectorAll('.content-switch-btn').forEach(b => b.classList.toggle('active', b.dataset.ct === type));
+};
+
+window.closePlayer = () => {
+  document.getElementById('player-view').classList.add('hidden');
+  document.getElementById('dashboard-view').classList.remove('hidden');
+  document.getElementById('main-video-frame').src = '';
+  document.getElementById('player-content-switch').classList.add('hidden');
+  currentContentSet = {};
+  currentClassContext = null;
+  if(activeChatUnsub) activeChatUnsub();
+  if(activeDoubtUnsub) activeDoubtUnsub();
+  if(activePollUnsub) activePollUnsub();
+  if(chatPurgeInterval) clearInterval(chatPurgeInterval);
+  clearInterval(pollTimerInterval);
+  document.getElementById('s-poll-overlay').classList.add('hidden');
+};
+
+function setupPlayerTabs(isLive) {
+  const tabs = document.getElementById('player-tabs'); tabs.innerHTML = '';
+  if (isLive) {
+    tabs.innerHTML = `
+      <button class="ptab active" id="ptab-chat" onclick="switchPlayerTab('chat')">Chat</button>
+      <button class="ptab" id="ptab-doubts" onclick="switchPlayerTab('doubts')">Doubts</button>
+      <button class="ptab" id="ptab-leaderboard" onclick="switchPlayerTab('leaderboard')">Polls</button>`;
+    switchPlayerTab('chat'); bindChatChannel(); bindIsolatedDoubtsChannel(); bindLivePollsChannel();
+  } else {
+    tabs.innerHTML = `
+      <button class="ptab active" id="ptab-bookmarks" onclick="switchPlayerTab('bookmarks')">Overview</button>
+      <button class="ptab" id="ptab-doubts" onclick="switchPlayerTab('doubts')">Doubts</button>`;
+    switchPlayerTab('bookmarks'); bindIsolatedDoubtsChannel();
+  }
+}
+
+window.switchPlayerTab = (tab) => {
+  ['chat','doubts','leaderboard','bookmarks'].forEach(t => {
+    const v = document.getElementById(`pview-${t}`); if(v) v.classList.add('hidden');
+    const b = document.getElementById(`ptab-${t}`); if(b) b.classList.remove('active');
+  });
+  const tv = document.getElementById(`pview-${tab}`); if(tv) tv.classList.remove('hidden');
+  const tb = document.getElementById(`ptab-${tab}`); if(tb) tb.classList.add('active');
+};
+
+// ---- Live chat (auto-deletes messages older than 30s; purge runs from whichever client has the room open) ----
+function bindChatChannel() {
+  if(activeChatUnsub) activeChatUnsub();
+  const box = document.getElementById('player-chat-box'); box.innerHTML = '';
+  activeChatUnsub = onSnapshot(query(collection(db, "live_sessions/" + currentClassContext + "/chats"), orderBy("timestamp", "asc")), (snapshot) => {
+    box.innerHTML = '';
+    if(snapshot.empty) { box.innerHTML = '<p style="color:var(--dim);font-size:12px;text-align:center;margin-top:30px;">No messages yet. Say hello!</p>'; markConnOk(); return; }
+    snapshot.forEach(ds => {
+      const d = ds.data(); const isMe = d.senderId === currentUser.uid;
+      box.innerHTML += `<div class="chat-bubble fu ${isMe ? 'chat-mine':'chat-theirs'}"><span style="font-weight:800;font-size:10px;color:var(--purple);display:block;margin-bottom:3px;">${esc(d.sender)}</span><p style="color:var(--text);font-size:12.5px;line-height:1.4;">${esc(d.message)}</p></div>`;
+    });
+    box.scrollTop = box.scrollHeight;
+    markConnOk();
+  }, markConnErr);
+
+  document.getElementById('player-chat-form').onsubmit = async (e) => {
+    e.preventDefault();
+    const input = document.getElementById('player-chat-input'); const msg = input.value.trim(); if(!msg) return;
+    input.value = '';
+    try {
+      await addDoc(collection(db, "live_sessions/" + currentClassContext + "/chats"), { sender: currentUser.displayName || 'Student', senderId: currentUser.uid, message: msg, timestamp: serverTimestamp() });
+    } catch(err) { toast('Message failed to send'); }
+  };
+
+  startChatPurge(currentClassContext);
+}
+
+function startChatPurge(sid) {
+  if (chatPurgeInterval) clearInterval(chatPurgeInterval);
+  chatPurgeInterval = setInterval(async () => {
+    try {
+      const snap = await getDocs(collection(db, "live_sessions/" + sid + "/chats"));
+      const cutoff = Date.now() - CHAT_TTL_MS;
+      const dels = [];
+      snap.forEach(d => {
+        const t = d.data().timestamp; const ms = t?.toMillis ? t.toMillis() : 0;
+        if (ms && ms < cutoff) dels.push(deleteDoc(doc(db, "live_sessions/" + sid + "/chats", d.id)).catch(()=>{}));
+      });
+      if (dels.length) await Promise.all(dels);
+    } catch(e) { /* ignore transient purge errors */ }
+  }, 4000);
+}
+
+window.toggleLiveDoubtSorting = type => {
+  liveDoubtSortCriteria = type;
+  document.getElementById('ld-sort-latest').classList.toggle('active', type === 'latest');
+  document.getElementById('ld-sort-popular').classList.toggle('active', type === 'popular');
+  bindIsolatedDoubtsChannel();
+};
+
+// ---- Doubts, contextual to the current class/recording. Uses a scoped subcollection so
+// no composite index is ever required (this is what made recorded-lecture doubts silently
+// fail to load before). ----
+function doubtsCollectionPath() {
+  return isLiveSession ? "live_sessions/" + currentClassContext + "/doubts" : "materials/" + currentClassContext + "/doubts";
+}
+
+function bindIsolatedDoubtsChannel() {
+  if(activeDoubtUnsub) activeDoubtUnsub();
+  const path = doubtsCollectionPath();
+  const q = liveDoubtSortCriteria === 'popular'
+    ? query(collection(db, path), orderBy("upvotes","desc"))
+    : query(collection(db, path), orderBy("timestamp","desc"));
+
+  activeDoubtUnsub = onSnapshot(q, async (snapshot) => {
+    const list = document.getElementById('player-doubts-list'); list.innerHTML = '';
+    const docs = snapshot.docs.filter(ds => ds.data().visibility !== 'private' || ds.data().studentId === currentUser.uid);
+    if(!docs.length) { list.innerHTML = '<p style="color:var(--dim);font-size:12px;text-align:center;margin-top:30px;">No doubts yet for this session.</p>'; markConnOk(); return; }
+
+    docs.forEach(ds => {
+      const d = ds.data(); const isAns = !!d.answer; const isPrivate = d.visibility === 'private'; const isUrgent = !!d.urgent;
+      list.innerHTML += `
+      <div class="dc ${isAns ? 'ans':''} ${isUrgent && !isAns ? 'urgent':''} fu" data-doubt-id="${ds.id}" style="padding:10px 12px;margin-bottom:8px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+          <span style="font-size:10px;font-weight:800;color:var(--purple);">${esc(d.studentName)} · ${timeAgo(d.timestamp)} ${isUrgent?'<i class="fa-solid fa-triangle-exclamation" style="margin-left:3px;color:var(--red);"></i>':''} ${isPrivate?'<i class="fa-solid fa-lock" style="margin-left:3px;color:var(--red);"></i>':''}</span>
+          <button class="live-upvote-btn" data-id="${ds.id}" style="background:none;border:none;cursor:pointer;color:var(--dim);font-size:10.5px;font-weight:700;font-family:var(--ff-body);transition:color 0.2s;">
+            <i class="fa-solid fa-caret-up"></i> ${d.upvotes || 0}
+          </button>
+        </div>
+        <p style="font-size:12px;color:var(--text);line-height:1.5;">${esc(d.description)}</p>
+        ${isAns ? `<div style="margin-top:7px;padding:7px 10px;border-radius:8px;background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.15);"><p style="font-size:9.5px;font-weight:800;color:var(--green);text-transform:uppercase;margin-bottom:3px;">Answer</p><p style="font-size:11.5px;color:var(--text);">${esc(d.answer)}</p></div>`:''}
+      </div>`;
+    });
+    markConnOk();
+
+    list.querySelectorAll('.live-upvote-btn').forEach(async btn => {
+      const id = btn.dataset.id;
+      if (await hasVotedFor(id)) { btn.disabled = true; btn.style.color = 'var(--green)'; btn.style.cursor='not-allowed'; }
+    });
+    list.querySelectorAll('.live-upvote-btn').forEach(btn => {
+      btn.addEventListener('click', () => { if(btn.disabled) return; btn.disabled = true; castUpvote(path, btn.dataset.id); });
+    });
+  }, markConnErr);
+
+  document.getElementById('player-doubt-form').onsubmit = async (e) => {
+    e.preventDefault();
+    const input = document.getElementById('player-doubt-input');
+    const val = input.value.trim(); if(!val) return;
+    input.value = '';
+    try {
+      await addDoc(collection(db, doubtsCollectionPath()), {
+        description: val,
+        studentName: currentUser.displayName || 'Student',
+        studentId: currentUser.uid,
+        visibility: doubtVisibility.ld ? 'public' : 'private',
+        urgent: document.getElementById('ld-urgent').checked,
+        upvotes: 0,
+        timestamp: serverTimestamp()
+      });
+      document.getElementById('ld-urgent').checked = false;
+    } catch(err) { toast('Could not submit doubt'); }
+  };
+  setDoubtVisibility('ld', true);
+}
+
+// ---- Live polls: 4 types (MCQ / multi-correct / integer / vote). For the first three, the
+// correct answer is unknown to everyone (including this client) until the admin grades the
+// poll after the timer ends — so nothing can leak on a shared screen mid-poll. Vote has no
+// correct answer and its results are visible live. ----
+const TYPE_LABEL = {mcq:'MCQ', multi:'Multi-Correct', integer:'Integer', vote:'Vote'};
+let multiSelection = [];
+
+function bindLivePollsChannel() {
+  if(activePollUnsub) activePollUnsub();
+  activePollUnsub = onSnapshot(collection(db, "live_sessions/" + currentClassContext + "/polls"), (snapshot) => {
+    let activePollDoc = null;
+    const listEl = document.getElementById('s-polls-list'); listEl.innerHTML = '';
+    let allPolls = [];
+    snapshot.forEach(docSnap => { const pData = docSnap.data(); pData.id = docSnap.id; allPolls.push(pData); });
+    allPolls.sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
+
+    allPolls.forEach(pData => {
+      const type = pData.type || 'mcq';
+      const stillOpen = pData.active && pData.expiresAt && Date.now() < pData.expiresAt;
+      if (stillOpen) activePollDoc = pData;
+      const responded = !!(pData.responses||{})[currentUser.uid];
+      const lb = (pData.leaderboard||[]).slice().sort((a,b) => a.timeToAnswer - b.timeToAnswer);
+      const status = stillOpen ? '<span class="badge badge-red" style="font-size:9px;">Live</span>' : (type==='vote'||pData.graded ? '<span class="badge badge-green" style="font-size:9px;">Closed</span>' : '<span class="badge badge-yellow" style="font-size:9px;">Awaiting grading</span>');
+      listEl.innerHTML += `
+      <div class="glass fu" style="border-radius:14px;padding:12px 14px;">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap;">
+          <span class="badge badge-purple" style="font-size:9px;">${TYPE_LABEL[type]}</span>${status}
+          ${responded ? '<span style="font-size:10px;color:var(--dim);">You responded</span>' : ''}
+        </div>
+        <p style="font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:6px;">${esc(pData.question)}</p>
+        ${(pData.graded && type!=='vote') ? `<button class="btn btn-ghost btn-xs" onclick="togglePollResult('${pData.id}')" style="margin-top:2px;"><i class="fa-solid fa-trophy" style="color:var(--amber);"></i> View Result & Leaderboard</button>
+        <div id="s-lb-${pData.id}" class="hidden" style="margin-top:8px;display:flex;flex-direction:column;gap:6px;">
+          ${type==='mcq' ? `<p style="font-size:11.5px;color:var(--dim);">Correct: <b style="color:var(--green);">${['A','B','C','D'][pData.correctOption]}. ${esc((pData.options||[])[pData.correctOption]||'')}</b></p>` : ''}
+          ${type==='multi' ? `<p style="font-size:11.5px;color:var(--dim);">Correct: <b style="color:var(--green);">${(pData.correctOptions||[]).map(i=>['A','B','C','D'][i]).join(', ')}</b></p>` : ''}
+          ${type==='integer' ? `<p style="font-size:11.5px;color:var(--dim);">Correct answer: <b style="color:var(--green);">${esc(pData.correctAnswer)}</b></p>` : ''}
+          ${lb.length ? lb.slice(0,5).map((e,i)=>`<div style="display:flex;justify-content:space-between;font-size:11.5px;background:rgba(255,255,255,0.5);border:1px solid var(--border);border-radius:8px;padding:6px 10px;"><span><b style="color:var(--purple);">#${i+1}</b> ${esc(e.studentName)}</span><span style="color:var(--green);font-weight:700;">${(e.timeToAnswer/1000).toFixed(2)}s</span></div>`).join('') : `<p style="font-size:11px;color:var(--dim);font-style:italic;">No one answered correctly.</p>`}
+        </div>` : ''}
+      </div>`;
+    });
+
+    const overlay = document.getElementById('s-poll-overlay');
+    if (activePollDoc) {
+      hasVotedCurrent = !!(activePollDoc.responses||{})[currentUser.uid];
+      overlay.classList.remove('hidden');
+      document.getElementById('s-poll-question').innerText = activePollDoc.question;
+      renderPollInput(activePollDoc);
+      startPollTimer(activePollDoc.expiresAt, activePollDoc.duration);
+    } else {
+      overlay.classList.add('hidden'); clearInterval(pollTimerInterval); hasVotedCurrent = false;
+    }
+    markConnOk();
+  }, markConnErr);
+}
+
+window.togglePollResult = id => { const el = document.getElementById('s-lb-'+id); if(el) el.classList.toggle('hidden'); };
+
+function renderPollInput(pollDoc) {
+  const type = pollDoc.type || 'mcq';
+  const box = document.getElementById('s-poll-options');
+  const dist = pollDoc.votesDistribution || {};
+  const total = Object.values(dist).reduce((a,c) => a + (c||0), 0) || 0;
+
+  if (hasVotedCurrent) {
+    box.innerHTML = `<div style="text-align:center;padding:20px 10px;color:var(--dim);"><i class="fa-solid fa-circle-check" style="color:var(--green);font-size:1.6rem;display:block;margin-bottom:8px;"></i><p style="font-size:12.5px;font-weight:600;">Response submitted. ${type==='vote' ? 'Results below.' : "Results appear in the Polls tab once graded."}</p></div>`;
+    if (type === 'vote') {
+      box.innerHTML += (pollDoc.options||[]).map((opt,i) => {
+        const c = dist[i]||0; const pct = total ? Math.round((c/total)*100) : 0;
+        return `<div class="pc-opt-wrapper locked" style="margin-top:8px;"><div class="pc-opt-fill" style="width:${pct}%"></div><div class="pc-opt-content"><span><span style="color:var(--purple);margin-right:6px;">${['A','B','C','D'][i]}.</span>${esc(opt)}</span><span style="font-size:11px;color:var(--dim);font-weight:800;">${pct}%</span></div></div>`;
+      }).join('');
+    }
+    return;
+  }
+
+  if (type === 'mcq' || type === 'vote') {
+    box.innerHTML = (pollDoc.options||[]).map((opt,i) => `
+      <div class="pc-opt-wrapper" onclick="submitPollResponse('${pollDoc.id}',${i})">
+        <div class="pc-opt-content" style="font-weight:700;font-size:12.5px;color:var(--text);">
+          <span><span style="color:var(--purple);margin-right:6px;">${['A','B','C','D'][i]}.</span>${esc(opt)}</span>
+        </div>
+      </div>`).join('');
+  } else if (type === 'multi') {
+    multiSelection = [];
+    box.innerHTML = (pollDoc.options||[]).map((opt,i) => `
+      <div class="pc-opt-wrapper" id="mopt-${i}" onclick="toggleMultiOpt(${i})">
+        <div class="pc-opt-content" style="font-weight:700;font-size:12.5px;color:var(--text);">
+          <span><span style="color:var(--purple);margin-right:6px;">${['A','B','C','D'][i]}.</span>${esc(opt)}</span>
+          <i class="fa-regular fa-square" id="mopt-icon-${i}"></i>
+        </div>
+      </div>`).join('') + `<button class="btn btn-purple btn-sm" style="width:100%;justify-content:center;margin-top:6px;" onclick="submitMultiResponse('${pollDoc.id}')">Submit Answer</button>`;
+  } else if (type === 'integer') {
+    box.innerHTML = `
+      <input type="number" id="s-integer-input" class="inp" placeholder="Type your numeric answer..." style="margin-bottom:10px;">
+      <button class="btn btn-purple btn-sm" style="width:100%;justify-content:center;" onclick="submitIntegerResponse('${pollDoc.id}')">Submit Answer</button>`;
+  }
+}
+
+window.toggleMultiOpt = i => {
+  const idx = multiSelection.indexOf(i);
+  if (idx >= 0) multiSelection.splice(idx,1); else multiSelection.push(i);
+  const wrap = document.getElementById('mopt-'+i), icon = document.getElementById('mopt-icon-'+i);
+  if (wrap) wrap.style.borderColor = multiSelection.includes(i) ? 'var(--purple)' : '';
+  if (icon) icon.className = multiSelection.includes(i) ? 'fa-solid fa-square-check' : 'fa-regular fa-square';
+};
+window.submitMultiResponse = pollId => { if(!multiSelection.length){toast('Select at least one option.');return;} submitPollResponse(pollId, multiSelection.slice()); };
+window.submitIntegerResponse = pollId => {
+  const v = document.getElementById('s-integer-input').value.trim();
+  if (!v) { toast('Enter a numeric answer.'); return; }
+  submitPollResponse(pollId, v);
+};
+
+function startPollTimer(expiresAt, duration) {
+  clearInterval(pollTimerInterval);
+  pollTimerInterval = setInterval(() => {
+    const left = Math.round((expiresAt - Date.now())/1000);
+    const pct = Math.max(0, (left/duration)*100);
+    const timerEl = document.getElementById('s-poll-timer');
+    const progEl = document.getElementById('s-poll-progress');
+    if(timerEl) timerEl.innerText = Math.max(0, left);
+    if(progEl) progEl.style.width = pct + '%';
+    if (left <= 0) clearInterval(pollTimerInterval);
+  }, 500);
+}
+
+// One response per uid, enforced server-side inside the transaction (not just a client flag).
+window.submitPollResponse = async (pollId, value) => {
+  if (hasVotedCurrent) return;
+  hasVotedCurrent = true;
+  const pollRef = doc(db, "live_sessions/" + currentClassContext + "/polls", pollId);
+  try {
+    await runTransaction(db, async (tx) => {
+      const snap = await tx.get(pollRef);
+      if (!snap.exists()) throw new Error('GONE');
+      const data = snap.data();
+      if (!data.expiresAt || Date.now() >= data.expiresAt) throw new Error('EXPIRED');
+      const responses = data.responses || {};
+      if (responses[currentUser.uid]) throw new Error('ALREADY_VOTED');
+      const update = {};
+      update['responses.' + currentUser.uid] = { value, studentName: currentUser.displayName || 'Student', timestamp: Date.now() };
+      if (Array.isArray(value)) {
+        value.forEach(i => { update['votesDistribution.' + i] = (data.votesDistribution?.[i] || 0) + 1; });
+      } else if (typeof value === 'number') {
+        update['votesDistribution.' + value] = (data.votesDistribution?.[value] || 0) + 1;
+      }
+      tx.update(pollRef, update);
+    });
+  } catch(e) {
+    hasVotedCurrent = e.message === 'ALREADY_VOTED';
+    if (e.message === 'ALREADY_VOTED') toast('You already answered this poll.');
+    else if (e.message === 'EXPIRED') toast('Poll already closed.');
+    else if (e.message !== 'GONE') { console.error(e); toast('Response failed to register.'); hasVotedCurrent = false; }
+  }
+};
+</script>
+</body>
+</html>

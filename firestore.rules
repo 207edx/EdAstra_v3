@@ -1,0 +1,141 @@
+rules_version = '2';
+
+// ============================================================================
+// AstroCore — Firestore Security Rules
+//
+// The old version of this app had NO real security rules and NO server-verified
+// admin role — admin.html let in *any* signed-in account, and a student could have
+// self-escalated by simply writing role:"admin" onto their own /users/{uid} doc from
+// the browser console. These rules close both gaps:
+//   - "admin" is only ever true via a Firebase Auth CUSTOM CLAIM, set exclusively by
+//     the server-side Admin SDK (see api/admin/set-role.js) — never something the
+//     client can set on itself, in Firestore or otherwise.
+//   - Every collection now has an explicit, minimal allow-list instead of relying on
+//     the frontend to "just not" call an update it shouldn't.
+// ============================================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() { return request.auth != null; }
+    function isAdmin()    { return isSignedIn() && request.auth.token.admin == true; }
+    function isOwner(uid) { return isSignedIn() && request.auth.uid == uid; }
+    function onlyChanged(fields) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(fields);
+    }
+
+    // ---- users/{uid} — profile + role ----
+    match /users/{uid} {
+      allow read: if isSignedIn();
+      // A user may create their own profile exactly once, always as "student" — this
+      // covers self-signup in index.html. Admin profile docs are also created client-side
+      // the first time an already-claim-granted admin logs into admin.html, which is why
+      // isAdmin() is allowed here too (their custom claim was already set server-side).
+      allow create: if isAdmin() || (isOwner(uid) && request.resource.data.role == 'student');
+      // Owners may edit their own profile (name, theme, watched-progress, avatar) but
+      // can never touch the role field themselves — admin-only, or no-op on that field.
+      allow update: if isAdmin() || (isOwner(uid) && onlyChanged(['displayName','photoURL','theme','watched']));
+      allow delete: if isAdmin();
+    }
+
+    // ---- folders (content organization) ----
+    match /folders/{folderId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // ---- materials: recorded videos / PDFs ----
+    match /materials/{materialId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+
+      match /doubts/{doubtId} {
+        allow read: if isSignedIn();
+        allow create: if isSignedIn() && request.resource.data.studentId == request.auth.uid;
+        allow update: if isAdmin(); // answering / editing a doubt is an admin action
+        allow delete: if isAdmin() || isOwner(resource.data.studentId);
+      }
+    }
+
+    // ---- global doubts feed (cross-content Q&A wall) ----
+    match /doubts/{doubtId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.studentId == request.auth.uid;
+      // Anyone signed in may bump the upvote counter (the actual once-per-user guard
+      // lives in the /votes ledger below); admins may also edit/answer.
+      allow update: if isAdmin() || onlyChanged(['upvotes']);
+      allow delete: if isAdmin() || isOwner(resource.data.studentId);
+    }
+
+    // ---- one-vote-per-user ledger, doc id "{uid}_{targetId}" ----
+    match /votes/{voteId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn()
+                    && request.resource.data.uid == request.auth.uid
+                    && voteId == request.auth.uid + '_' + request.resource.data.targetId;
+      allow update, delete: if false; // votes are permanent once cast
+    }
+
+    // ---- live class sessions ----
+    match /live_sessions/{sessionId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+
+      match /chats/{msgId} {
+        allow read: if isSignedIn();
+        allow create: if isSignedIn() && request.resource.data.senderId == request.auth.uid;
+        allow update: if false;
+        allow delete: if isAdmin() || isOwner(resource.data.senderId);
+      }
+
+      match /doubts/{doubtId} {
+        allow read: if isSignedIn();
+        allow create: if isSignedIn() && request.resource.data.studentId == request.auth.uid;
+        allow update: if isAdmin() || onlyChanged(['upvotes']);
+        allow delete: if isAdmin() || isOwner(resource.data.studentId);
+      }
+
+      match /polls/{pollId} {
+        allow read: if isSignedIn();
+        allow create, delete: if isAdmin();
+        // Admin can edit anything (grading, closing). A student may ONLY submit their
+        // own single response while the poll is still open — enforced as a backstop
+        // here even though the client also runs this as a transaction.
+        allow update: if isAdmin() || isValidStudentResponse();
+
+        function isValidStudentResponse() {
+          return isSignedIn()
+            && onlyChanged(['responses', 'votesDistribution'])
+            && !(request.auth.uid in resource.data.get('responses', {}))
+            && request.auth.uid in request.resource.data.responses
+            && resource.data.get('expiresAt', 0) is number
+            && request.time.toMillis() < resource.data.expiresAt;
+        }
+      }
+
+      // Not currently written to by the student portal (the UI exists in admin.html but
+      // nothing populates it yet) — locked to admin-only until/unless you wire it up.
+      // If you add student check-in later, mirror the /chats pattern above: allow create
+      // where request.resource.data.<ownerField> == request.auth.uid.
+      match /attendance/{recordId} {
+        allow read: if isSignedIn();
+        allow write: if isAdmin();
+      }
+    }
+
+    // ---- poll templates & graded history (admin-authored) ----
+    match /poll_templates/{id} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+    match /poll_history/{id} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Deny anything not explicitly allowed above.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "astrocore",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AstroCore student portal — static frontend + Vercel serverless backend on Firebase.",
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.7.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,0 +1,13 @@
+rules_version = '2';
+
+// AstroCore doesn't use Firebase Storage today (videos are YouTube embeds, PDFs are
+// external links). This file just locks Storage down by default so an empty/default
+// bucket doesn't sit wide open — deploy it anyway for defense in depth. If you later
+// add file uploads (e.g. avatars, PDF hosting), extend the rule below.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
